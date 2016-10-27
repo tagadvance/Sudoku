@@ -14,7 +14,7 @@ import java.util.Set;
 
 import com.google.common.base.Preconditions;
 
-public abstract class AbstractSudoku implements Cloneable {
+public abstract class AbstractSudoku implements Copyable<AbstractSudoku>  {
 
 	public static final String EMPTY = "?";
 
@@ -207,11 +207,6 @@ public abstract class AbstractSudoku implements Cloneable {
 			sb.append("\n");
 		}
 		return sb.toString();
-	}
-
-	@Override
-	public Object clone() {
-		throw new UnsupportedOperationException(new CloneNotSupportedException());
 	}
 
 	@Override

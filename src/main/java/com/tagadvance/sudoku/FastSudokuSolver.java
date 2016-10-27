@@ -40,7 +40,7 @@ public class FastSudokuSolver {
 
 	public void setSudoku(AbstractSudoku sudoku) {
 		Preconditions.checkNotNull(sudoku, "sudoku must not be null");
-		this.sudoku = (AbstractSudoku) sudoku.clone();
+		this.sudoku = sudoku.copy();
 	}
 
 	public AbstractSudoku solve() throws UnsolvableException {
@@ -235,7 +235,7 @@ public class FastSudokuSolver {
 
 		public SudokuWorker(AbstractSudoku sudoku) {
 			super();
-			this.sudoku = (AbstractSudoku) sudoku.clone();
+			this.sudoku = sudoku.copy();
 		}
 
 		@Override

@@ -60,7 +60,7 @@ class ClassicSudoku extends AbstractSudoku {
 	}
 
 	@Override
-	public Object clone() {
+	public ClassicSudoku copy() {
 		return new ClassicSudoku(this);
 	}
 
