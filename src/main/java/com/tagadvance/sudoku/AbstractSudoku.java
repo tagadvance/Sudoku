@@ -68,17 +68,11 @@ public abstract class AbstractSudoku implements Sudoku  {
 		this.grid = new String[height][width];
 	}
 
-	/* (non-Javadoc)
-	 * @see com.tagadvance.sudoku.Sudoku#getCellValue(int, int)
-	 */
 	@Override
 	public String getCellValue(int x, int y) {
 		return this.grid[y][x];
 	}
 
-	/* (non-Javadoc)
-	 * @see com.tagadvance.sudoku.Sudoku#setCellValue(int, int, java.lang.String)
-	 */
 	@Override
 	public void setCellValue(int x, int y, String value) {
 		this.grid[y][x] = prepareValue(value);
@@ -92,9 +86,6 @@ public abstract class AbstractSudoku implements Sudoku  {
 		return value.toLowerCase();
 	}
 
-	/* (non-Javadoc)
-	 * @see com.tagadvance.sudoku.Sudoku#getSize()
-	 */
 	@Override
 	public Dimension getSize() {
 		return new Dimension(width, height);
@@ -104,17 +95,11 @@ public abstract class AbstractSudoku implements Sudoku  {
 
 	protected abstract Set<Scope> createScopes();
 
-	/* (non-Javadoc)
-	 * @see com.tagadvance.sudoku.Sudoku#getScopes()
-	 */
 	@Override
 	public Set<Scope> getScopes() {
 		return Collections.unmodifiableSet(this.scopes);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.tagadvance.sudoku.Sudoku#getScopesForCell(int, int)
-	 */
 	@Override
 	public Set<Scope> getScopesForCell(int x, int y) {
 		Point p = new Point(x, y);
@@ -133,9 +118,6 @@ public abstract class AbstractSudoku implements Sudoku  {
 		return scopes;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.tagadvance.sudoku.Sudoku#getCellPotentialValues(int, int)
-	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	public Set<String> getCellPotentialValues(int x, int y) {
@@ -148,9 +130,6 @@ public abstract class AbstractSudoku implements Sudoku  {
 		return getCommonElements(stringSets);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.tagadvance.sudoku.Sudoku#clear()
-	 */
 	@Override
 	public void clear() {
 		for (int y = 0; y < height; y++) {
@@ -160,9 +139,6 @@ public abstract class AbstractSudoku implements Sudoku  {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see com.tagadvance.sudoku.Sudoku#getEmptyCells()
-	 */
 	@Override
 	public List<Point> getEmptyCells() {
 		List<Point> list = new ArrayList<Point>();
@@ -176,26 +152,17 @@ public abstract class AbstractSudoku implements Sudoku  {
 		return list;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.tagadvance.sudoku.Sudoku#isCellEmpty(int, int)
-	 */
 	@Override
 	public boolean isCellEmpty(int x, int y) {
 		String value = getCellValue(x, y);
 		return isEmpty(value);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.tagadvance.sudoku.Sudoku#isEmpty(java.lang.String)
-	 */
 	@Override
 	public boolean isEmpty(String value) {
 		return (value == null || value.isEmpty() || value.equals(EMPTY));
 	}
 
-	/* (non-Javadoc)
-	 * @see com.tagadvance.sudoku.Sudoku#isValid()
-	 */
 	@Override
 	public boolean isValid() {
 		for (Scope scope : getScopes()) {
@@ -206,9 +173,6 @@ public abstract class AbstractSudoku implements Sudoku  {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.tagadvance.sudoku.Sudoku#validate()
-	 */
 	@Override
 	public void validate() throws UnsolvableException {
 		for (Scope scope : getScopes()) {
@@ -216,9 +180,6 @@ public abstract class AbstractSudoku implements Sudoku  {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see com.tagadvance.sudoku.Sudoku#isSolved()
-	 */
 	@Override
 	public boolean isSolved() {
 		for (Scope scope : getScopes()) {
