@@ -221,19 +221,6 @@ public abstract class AbstractSudoku implements Sudoku  {
 		return true;
 	}
 
-	public static Sudoku demo(AbstractSudoku sudoku, String puzzle) {
-		int x = 0, y = 0;
-		for (int i = 0; i < puzzle.length(); i++) {
-			String value = puzzle.substring(i, i + 1);
-			sudoku.setCellValue(x, y, value);
-			if (++x >= sudoku.width) {
-				y++;
-				x = 0;
-			}
-		}
-		return sudoku;
-	}
-
 	/**
 	 * 
 	 * @param <E>
