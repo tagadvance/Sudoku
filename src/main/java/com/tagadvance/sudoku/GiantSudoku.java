@@ -3,7 +3,7 @@ package com.tagadvance.sudoku;
 import java.util.HashSet;
 import java.util.Set;
 
-class GiantSudoku extends Sudoku {
+class GiantSudoku extends AbstractSudoku {
 
 	public static final int GIANT_WIDTH = 25, GIANT_HEIGHT = 25;
 
@@ -11,7 +11,7 @@ class GiantSudoku extends Sudoku {
 		super(GIANT_WIDTH, GIANT_HEIGHT);
 	}
 
-	public GiantSudoku(Sudoku parent) {
+	public GiantSudoku(AbstractSudoku parent) {
 		super(parent);
 	}
 

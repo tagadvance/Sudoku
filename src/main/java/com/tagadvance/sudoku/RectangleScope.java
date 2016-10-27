@@ -9,10 +9,10 @@ import java.util.Set;
 @SuppressWarnings("serial")
 class RectangleScope extends Rectangle implements Scope {
 
-	private Sudoku sudoku;
+	private AbstractSudoku sudoku;
 	private final Set<Point> cells;
 
-	public RectangleScope(Sudoku sudoku, int x, int y, int width, int height) {
+	public RectangleScope(AbstractSudoku sudoku, int x, int y, int width, int height) {
 		super(x, y, width, height);
 		setSudoku(sudoku);
 
@@ -33,7 +33,7 @@ class RectangleScope extends Rectangle implements Scope {
 		return this.cells;
 	}
 
-	private void setSudoku(Sudoku sudoku) {
+	private void setSudoku(AbstractSudoku sudoku) {
 		if (sudoku == null)
 			throw new IllegalArgumentException("sudoku must not be null");
 		this.sudoku = sudoku;

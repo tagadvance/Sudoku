@@ -18,31 +18,31 @@ import java.util.concurrent.Future;
 
 public class SudokuSolver {
 
-	private Sudoku sudoku;
+	private AbstractSudoku sudoku;
 
 	private ExecutorService threadPool;
 	private final Object lock = new Object();
 	private volatile boolean shutdown;
 	private volatile int callCount;
 	private long start;
-	private List<Future<Sudoku>> futureList;
+	private List<Future<AbstractSudoku>> futureList;
 
-	public SudokuSolver(Sudoku sudoku) {
+	public SudokuSolver(AbstractSudoku sudoku) {
 		super();
 		setSudoku(sudoku);
 	}
 
-	public Sudoku getSudoku() {
+	public AbstractSudoku getSudoku() {
 		return sudoku;
 	}
 
-	public void setSudoku(Sudoku sudoku) {
+	public void setSudoku(AbstractSudoku sudoku) {
 		if (sudoku == null)
 			throw new IllegalArgumentException("sudoku must not be null");
-		this.sudoku = (Sudoku) sudoku.clone();
+		this.sudoku = (AbstractSudoku) sudoku.clone();
 	}
 
-	public Sudoku solve() throws UnsolvableException {
+	public AbstractSudoku solve() throws UnsolvableException {
 		sudoku.validate();
 
 		solveSingles();
@@ -59,9 +59,9 @@ public class SudokuSolver {
 		callCount = 0;
 		start = System.currentTimeMillis();
 
-		this.futureList = new ArrayList<Future<Sudoku>>();
-		for (Callable<Sudoku> call : callList) {
-			Future<Sudoku> future = threadPool.submit(call);
+		this.futureList = new ArrayList<Future<AbstractSudoku>>();
+		for (Callable<AbstractSudoku> call : callList) {
+			Future<AbstractSudoku> future = threadPool.submit(call);
 			futureList.add(future);
 		}
 
@@ -116,19 +116,19 @@ public class SudokuSolver {
 			fork(callList, depth - 1);
 		}
 
-		sudoku.setCellValue(pt.x, pt.y, Sudoku.EMPTY);
+		sudoku.setCellValue(pt.x, pt.y, AbstractSudoku.EMPTY);
 	}
 
-	private Sudoku join() {
+	private AbstractSudoku join() {
 		while (!threadPool.isTerminated()) {
-			for (Iterator<Future<Sudoku>> i = futureList.iterator(); i.hasNext();) {
-				Future<Sudoku> future = i.next();
+			for (Iterator<Future<AbstractSudoku>> i = futureList.iterator(); i.hasNext();) {
+				Future<AbstractSudoku> future = i.next();
 				if (!future.isDone())
 					continue;
 
 				i.remove();
 
-				Sudoku result = null;
+				AbstractSudoku result = null;
 				try {
 					result = future.get();
 				} catch (InterruptedException e) {
@@ -161,7 +161,7 @@ public class SudokuSolver {
 		System.out.println((stop - start) / 1000 + " seconds");
 	}
 
-	private Sudoku solve(Sudoku sudoku, List<Point> cells) {
+	private AbstractSudoku solve(AbstractSudoku sudoku, List<Point> cells) {
 		if (shutdown)
 			return null;
 		if (sudoku.isSolved())
@@ -184,24 +184,24 @@ public class SudokuSolver {
 		Set<Character> potentialCellValues = sudoku.getCellPotentialValues(p.x, p.y);
 		for (Character value : potentialCellValues) {
 			sudoku.setCellValue(p.x, p.y, value);
-			Sudoku result = solve(sudoku, null);
+			AbstractSudoku result = solve(sudoku, null);
 			if (result != null)
 				return result;
 		}
 
-		sudoku.setCellValue(p.x, p.y, Sudoku.EMPTY);
+		sudoku.setCellValue(p.x, p.y, AbstractSudoku.EMPTY);
 		cells.add(0, p);
 
 		return null;
 	}
 
-	private List<Point> getPriorityList(Sudoku sudoku) {
+	private List<Point> getPriorityList(AbstractSudoku sudoku) {
 		List<Point> emptyCells = sudoku.getEmptyCells();
 		prioritize(sudoku, emptyCells);
 		return emptyCells;
 	}
 
-	private Map<Point, Integer> prioritize(Sudoku sudoku, List<Point> emptyCells) {
+	private Map<Point, Integer> prioritize(AbstractSudoku sudoku, List<Point> emptyCells) {
 		final Map<Point, Integer> cells = new HashMap<Point, Integer>();
 		for (Point p : emptyCells) {
 			Set<Character> potentialValues = sudoku.getCellPotentialValues(p.x, p.y);
@@ -220,17 +220,17 @@ public class SudokuSolver {
 		return cells;
 	}
 
-	private class SudokuWorker implements Callable<Sudoku> {
+	private class SudokuWorker implements Callable<AbstractSudoku> {
 
-		private Sudoku sudoku;
+		private AbstractSudoku sudoku;
 
-		public SudokuWorker(Sudoku sudoku) {
+		public SudokuWorker(AbstractSudoku sudoku) {
 			super();
-			this.sudoku = (Sudoku) sudoku.clone();
+			this.sudoku = (AbstractSudoku) sudoku.clone();
 		}
 
 		@Override
-		public Sudoku call() throws Exception {
+		public AbstractSudoku call() throws Exception {
 			try {
 				return solve(sudoku, null);
 			} finally {

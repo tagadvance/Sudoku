@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-abstract class Sudoku implements Cloneable {
+abstract class AbstractSudoku implements Cloneable {
 
 	public static final char EMPTY = '?';
 
@@ -31,7 +31,7 @@ abstract class Sudoku implements Cloneable {
 	 * @param possibleValues
 	 * @throws IllegalArgumentException
 	 */
-	protected Sudoku(int width, int height) {
+	protected AbstractSudoku(int width, int height) {
 		super();
 
 		this.width = width;
@@ -42,7 +42,7 @@ abstract class Sudoku implements Cloneable {
 		this.cellScopes = new HashMap<Point, Set<Scope>>(grid.length);
 	}
 
-	protected Sudoku(Sudoku parent) {
+	protected AbstractSudoku(AbstractSudoku parent) {
 		super();
 
 		this.width = parent.width;
@@ -143,7 +143,7 @@ abstract class Sudoku implements Cloneable {
 		}
 	}
 
-	public Sudoku solve() throws UnsolvableException {
+	public AbstractSudoku solve() throws UnsolvableException {
 		return new SudokuSolver(this).solve();
 	}
 
@@ -208,7 +208,7 @@ abstract class Sudoku implements Cloneable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Sudoku other = (Sudoku) obj;
+		AbstractSudoku other = (AbstractSudoku) obj;
 		for (int y = 0; y < grid.length; y++) {
 			if (!Arrays.equals(grid[y], other.grid[y]))
 				return false;
@@ -216,7 +216,7 @@ abstract class Sudoku implements Cloneable {
 		return true;
 	}
 
-	public static Sudoku demo(Sudoku sudoku, String puzzle) {
+	public static AbstractSudoku demo(AbstractSudoku sudoku, String puzzle) {
 		int x = 0, y = 0;
 		for (int i = 0; i < puzzle.length(); i++) {
 			sudoku.setCellValue(x, y, puzzle.charAt(i));

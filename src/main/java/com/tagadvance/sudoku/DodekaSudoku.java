@@ -3,7 +3,7 @@ package com.tagadvance.sudoku;
 import java.util.HashSet;
 import java.util.Set;
 
-class DodekaSudoku extends Sudoku {
+class DodekaSudoku extends AbstractSudoku {
 
 	public static final int DODEKA_WIDTH = 12, DODEKA_HEIGHT = 12;
 
@@ -11,7 +11,7 @@ class DodekaSudoku extends Sudoku {
 		super(DODEKA_WIDTH, DODEKA_HEIGHT);
 	}
 
-	public DodekaSudoku(Sudoku parent) {
+	public DodekaSudoku(AbstractSudoku parent) {
 		super(parent);
 	}
 
@@ -60,8 +60,8 @@ class DodekaSudoku extends Sudoku {
 		return new DodekaSudoku(this);
 	}
 
-	public static Sudoku demo() {
-		Sudoku sudoku = new DodekaSudoku();
+	public static AbstractSudoku demo() {
+		AbstractSudoku sudoku = new DodekaSudoku();
 		String puzzle = "?1????4??730" + "9??8?b?7????" + "67???0????b?" + "b?30a???1?7?"
 				+ "5????3?4?a??" + "???7???6?3??" + "??8?1???b???" + "??4?6?a????3" + "?0?6???b94?8"
 				+ "?9????3???21" + "????5?6?4??a" + "8ab??7????9?";

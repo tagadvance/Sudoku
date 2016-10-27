@@ -3,7 +3,7 @@ package com.tagadvance.sudoku;
 import java.util.HashSet;
 import java.util.Set;
 
-class ClassicSudoku extends Sudoku {
+class ClassicSudoku extends AbstractSudoku {
 
 	public static final int CLASSIC_WIDTH = 9, CLASSIC_HEIGHT = 9;
 
@@ -11,7 +11,7 @@ class ClassicSudoku extends Sudoku {
 		super(CLASSIC_WIDTH, CLASSIC_HEIGHT);
 	}
 
-	public ClassicSudoku(Sudoku parent) {
+	public ClassicSudoku(AbstractSudoku parent) {
 		super(parent);
 	}
 
