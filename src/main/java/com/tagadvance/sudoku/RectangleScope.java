@@ -17,9 +17,11 @@ class RectangleScope extends Rectangle implements Scope {
 		setSudoku(sudoku);
 
 		Set<Point> cells = new HashSet<Point>();
-		for (int y2 = y; y2 < y + height; y2++)
-			for (int x2 = x; x2 < x + width; x2++)
+		for (int y2 = y; y2 < y + height; y2++) {
+			for (int x2 = x; x2 < x + width; x2++) {
 				cells.add(new Point(x2, y2));
+			}
+		}
 		this.cells = Collections.unmodifiableSet(cells);
 	}
 
@@ -34,8 +36,9 @@ class RectangleScope extends Rectangle implements Scope {
 	}
 
 	private void setSudoku(AbstractSudoku sudoku) {
-		if (sudoku == null)
+		if (sudoku == null) {
 			throw new IllegalArgumentException("sudoku must not be null");
+		}
 		this.sudoku = sudoku;
 	}
 
@@ -43,8 +46,9 @@ class RectangleScope extends Rectangle implements Scope {
 	public Set<Point> getEmptyCells() {
 		Set<Point> set = new HashSet<Point>();
 		for (Point cell : cells) {
-			if (sudoku.isCellEmpty(cell.x, cell.y))
+			if (sudoku.isCellEmpty(cell.x, cell.y)) {
 				set.add(new Point(cell));
+			}
 		}
 		return set;
 	}
@@ -54,8 +58,9 @@ class RectangleScope extends Rectangle implements Scope {
 		Set<String> set = new HashSet<String>();
 		for (Point cell : cells) {
 			String value = sudoku.getCellValue(cell.x, cell.y);
-			if (sudoku.isEmpty(value) && !set.add(value))
+			if (sudoku.isEmpty(value) && !set.add(value)) {
 				return false;
+			}
 		}
 		return true;
 	}
@@ -77,8 +82,9 @@ class RectangleScope extends Rectangle implements Scope {
 		Set<String> set = new HashSet<String>();
 		for (Point cell : cells) {
 			String value = sudoku.getCellValue(cell.x, cell.y);
-			if (sudoku.isEmpty(value) || !set.add(value))
+			if (sudoku.isEmpty(value) || !set.add(value)) {
 				return false;
+			}
 		}
 		return true;
 	}

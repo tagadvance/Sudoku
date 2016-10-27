@@ -48,19 +48,22 @@ public abstract class AbstractSudoku implements Cloneable {
 		this.width = parent.width;
 		this.height = parent.height;
 		createGrid();
-		for (int y = 0; y < grid.length; y++)
-			for (int x = 0; x < grid[y].length; x++)
+		for (int y = 0; y < grid.length; y++) {
+			for (int x = 0; x < grid[y].length; x++) {
 				grid[y][x] = parent.grid[y][x];
+			}
+		}
 
 		this.scopes = createScopes();
 		this.cellScopes = new HashMap<Point, Set<Scope>>(grid.length);
 	}
 
 	private void createGrid() {
-		if (width < MIN_SIZE || width > MAX_SIZE)
+		if (width < MIN_SIZE || width > MAX_SIZE) {
 			throw new IllegalArgumentException("invalid width " + width);
-		else if (height < MIN_SIZE || height > MAX_SIZE)
+		} else if (height < MIN_SIZE || height > MAX_SIZE) {
 			throw new IllegalArgumentException("invalid height " + height);
+		}
 		this.grid = new String[height][width];
 	}
 
@@ -149,10 +152,13 @@ public abstract class AbstractSudoku implements Cloneable {
 
 	public List<Point> getEmptyCells() {
 		List<Point> list = new ArrayList<Point>();
-		for (int y = 0; y < height; y++)
-			for (int x = 0; x < width; x++)
-				if (isCellEmpty(x, y))
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				if (isCellEmpty(x, y)) {
 					list.add(new Point(x, y));
+				}
+			}
+		}
 		return list;
 	}
 
@@ -166,21 +172,26 @@ public abstract class AbstractSudoku implements Cloneable {
 	}
 
 	public boolean isValid() {
-		for (Scope scope : getScopes())
-			if (!scope.isValid())
+		for (Scope scope : getScopes()) {
+			if (!scope.isValid()) {
 				return false;
+			}
+		}
 		return true;
 	}
 
 	public void validate() throws UnsolvableException {
-		for (Scope scope : getScopes())
+		for (Scope scope : getScopes()) {
 			scope.validate();
+		}
 	}
 
 	public boolean isSolved() {
-		for (Scope scope : getScopes())
-			if (!scope.isSolved())
+		for (Scope scope : getScopes()) {
+			if (!scope.isSolved()) {
 				return false;
+			}
+		}
 		return true;
 	}
 
@@ -204,16 +215,20 @@ public abstract class AbstractSudoku implements Cloneable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		AbstractSudoku other = (AbstractSudoku) obj;
 		for (int y = 0; y < grid.length; y++) {
-			if (!Arrays.equals(grid[y], other.grid[y]))
+			if (!Arrays.equals(grid[y], other.grid[y])) {
 				return false;
+			}
 		}
 		return true;
 	}
@@ -240,10 +255,12 @@ public abstract class AbstractSudoku implements Cloneable {
 	 */
 	public static <E> Set<E> getCommonElements(Collection<E>... collections) {
 		Set<E> common = new HashSet<E>();
-		for (Collection<E> collection : collections)
+		for (Collection<E> collection : collections) {
 			common.addAll(collection);
-		for (Collection<E> collection : collections)
+		}
+		for (Collection<E> collection : collections) {
 			common.retainAll(collection);
+		}
 		return common;
 	}
 

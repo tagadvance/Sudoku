@@ -79,8 +79,9 @@ public class FastSudokuSolver {
 			for (Map.Entry<Point, Integer> entry : priorityMap.entrySet()) {
 				Point pt = entry.getKey();
 				int potential = entry.getValue();
-				if (potential == 1)
+				if (potential == 1) {
 					singles.add(pt);
+				}
 			}
 			for (Point pt : singles) {
 				Set<String> set = sudoku.getCellPotentialValues(pt.x, pt.y);
@@ -123,8 +124,9 @@ public class FastSudokuSolver {
 		while (!threadPool.isTerminated()) {
 			for (Iterator<Future<AbstractSudoku>> i = futureList.iterator(); i.hasNext();) {
 				Future<AbstractSudoku> future = i.next();
-				if (!future.isDone())
+				if (!future.isDone()) {
 					continue;
+				}
 
 				i.remove();
 
@@ -162,10 +164,12 @@ public class FastSudokuSolver {
 	}
 
 	private AbstractSudoku solve(AbstractSudoku sudoku, List<Point> cells) {
-		if (shutdown)
+		if (shutdown) {
 			return null;
-		if (sudoku.isSolved())
+		}
+		if (sudoku.isSolved()) {
 			return sudoku;
+		}
 		if (futureList.size() == 1) {
 			try {
 				return sudoku.solve();
@@ -173,10 +177,12 @@ public class FastSudokuSolver {
 				e.printStackTrace();
 			}
 		}
-		if (cells == null)
+		if (cells == null) {
 			cells = getPriorityList(sudoku);
-		if (cells.isEmpty())
+		}
+		if (cells.isEmpty()) {
 			return null;
+		}
 		callCount++;
 
 		Point p = cells.remove(0);
@@ -185,8 +191,9 @@ public class FastSudokuSolver {
 		for (String value : potentialCellValues) {
 			sudoku.setCellValue(p.x, p.y, value);
 			AbstractSudoku result = solve(sudoku, null);
-			if (result != null)
+			if (result != null) {
 				return result;
+			}
 		}
 
 		sudoku.setCellValue(p.x, p.y, AbstractSudoku.EMPTY);
