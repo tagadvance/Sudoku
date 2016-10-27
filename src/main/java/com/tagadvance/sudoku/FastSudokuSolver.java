@@ -16,7 +16,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class SudokuSolver {
+public class FastSudokuSolver {
 
 	private AbstractSudoku sudoku;
 
@@ -27,7 +27,7 @@ public class SudokuSolver {
 	private long start;
 	private List<Future<AbstractSudoku>> futureList;
 
-	public SudokuSolver(AbstractSudoku sudoku) {
+	public FastSudokuSolver(AbstractSudoku sudoku) {
 		super();
 		setSudoku(sudoku);
 	}

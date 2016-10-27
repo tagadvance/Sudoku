@@ -144,7 +144,7 @@ abstract class AbstractSudoku implements Cloneable {
 	}
 
 	public AbstractSudoku solve() throws UnsolvableException {
-		return new SudokuSolver(this).solve();
+		return new FastSudokuSolver(this).solve();
 	}
 
 	public List<Point> getEmptyCells() {
