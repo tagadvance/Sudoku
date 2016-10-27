@@ -14,7 +14,7 @@ import java.util.Set;
 
 import com.google.common.base.Preconditions;
 
-public abstract class AbstractSudoku implements Copyable<AbstractSudoku>  {
+public abstract class AbstractSudoku implements Sudoku  {
 
 	public static final String EMPTY = "?";
 
@@ -68,17 +68,18 @@ public abstract class AbstractSudoku implements Copyable<AbstractSudoku>  {
 		this.grid = new String[height][width];
 	}
 
-	/**
-	 * 
-	 * @param x
-	 * @param y
-	 * @return
-	 * @throws IndexOutOfBoundsException
+	/* (non-Javadoc)
+	 * @see com.tagadvance.sudoku.Sudoku#getCellValue(int, int)
 	 */
+	@Override
 	public String getCellValue(int x, int y) {
 		return this.grid[y][x];
 	}
 
+	/* (non-Javadoc)
+	 * @see com.tagadvance.sudoku.Sudoku#setCellValue(int, int, java.lang.String)
+	 */
+	@Override
 	public void setCellValue(int x, int y, String value) {
 		this.grid[y][x] = prepareValue(value);
 	}
@@ -91,6 +92,10 @@ public abstract class AbstractSudoku implements Copyable<AbstractSudoku>  {
 		return value.toLowerCase();
 	}
 
+	/* (non-Javadoc)
+	 * @see com.tagadvance.sudoku.Sudoku#getSize()
+	 */
+	@Override
 	public Dimension getSize() {
 		return new Dimension(width, height);
 	}
@@ -99,10 +104,18 @@ public abstract class AbstractSudoku implements Copyable<AbstractSudoku>  {
 
 	protected abstract Set<Scope> createScopes();
 
+	/* (non-Javadoc)
+	 * @see com.tagadvance.sudoku.Sudoku#getScopes()
+	 */
+	@Override
 	public Set<Scope> getScopes() {
 		return Collections.unmodifiableSet(this.scopes);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.tagadvance.sudoku.Sudoku#getScopesForCell(int, int)
+	 */
+	@Override
 	public Set<Scope> getScopesForCell(int x, int y) {
 		Point p = new Point(x, y);
 		if (cellScopes.containsKey(p)) {
@@ -120,14 +133,10 @@ public abstract class AbstractSudoku implements Copyable<AbstractSudoku>  {
 		return scopes;
 	}
 
-	/**
-	 * I would like to optimize this by calculating the potential values for every cell which shares
-	 * a scope with the set cell when setCellValue is called
-	 * 
-	 * @param x
-	 * @param y
-	 * @return
+	/* (non-Javadoc)
+	 * @see com.tagadvance.sudoku.Sudoku#getCellPotentialValues(int, int)
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public Set<String> getCellPotentialValues(int x, int y) {
 		Set<Scope> scopes = getScopesForCell(x, y);
@@ -139,6 +148,10 @@ public abstract class AbstractSudoku implements Copyable<AbstractSudoku>  {
 		return getCommonElements(stringSets);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.tagadvance.sudoku.Sudoku#clear()
+	 */
+	@Override
 	public void clear() {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
@@ -147,10 +160,10 @@ public abstract class AbstractSudoku implements Copyable<AbstractSudoku>  {
 		}
 	}
 
-	public AbstractSudoku solve() throws UnsolvableException {
-		return new FastSudokuSolver(this).solve();
-	}
-
+	/* (non-Javadoc)
+	 * @see com.tagadvance.sudoku.Sudoku#getEmptyCells()
+	 */
+	@Override
 	public List<Point> getEmptyCells() {
 		List<Point> list = new ArrayList<Point>();
 		for (int y = 0; y < height; y++) {
@@ -163,15 +176,27 @@ public abstract class AbstractSudoku implements Copyable<AbstractSudoku>  {
 		return list;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.tagadvance.sudoku.Sudoku#isCellEmpty(int, int)
+	 */
+	@Override
 	public boolean isCellEmpty(int x, int y) {
 		String value = getCellValue(x, y);
 		return isEmpty(value);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.tagadvance.sudoku.Sudoku#isEmpty(java.lang.String)
+	 */
+	@Override
 	public boolean isEmpty(String value) {
 		return (value == null || value.isEmpty() || value.equals(EMPTY));
 	}
 
+	/* (non-Javadoc)
+	 * @see com.tagadvance.sudoku.Sudoku#isValid()
+	 */
+	@Override
 	public boolean isValid() {
 		for (Scope scope : getScopes()) {
 			if (!scope.isValid()) {
@@ -181,12 +206,20 @@ public abstract class AbstractSudoku implements Copyable<AbstractSudoku>  {
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.tagadvance.sudoku.Sudoku#validate()
+	 */
+	@Override
 	public void validate() throws UnsolvableException {
 		for (Scope scope : getScopes()) {
 			scope.validate();
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see com.tagadvance.sudoku.Sudoku#isSolved()
+	 */
+	@Override
 	public boolean isSolved() {
 		for (Scope scope : getScopes()) {
 			if (!scope.isSolved()) {
@@ -229,7 +262,7 @@ public abstract class AbstractSudoku implements Copyable<AbstractSudoku>  {
 		return true;
 	}
 
-	public static AbstractSudoku demo(AbstractSudoku sudoku, String puzzle) {
+	public static Sudoku demo(AbstractSudoku sudoku, String puzzle) {
 		int x = 0, y = 0;
 		for (int i = 0; i < puzzle.length(); i++) {
 			String value = puzzle.substring(i, i + 1);

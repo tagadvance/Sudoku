@@ -6,9 +6,10 @@ public class Main {
 
 	public static void main(String[] args)
 			throws UnsolvableException, IOException, InterruptedException {
-		AbstractSudoku sudoku = AbstractSudoku.demo(new ClassicSudoku(),
+		AbstractSudoku sudoku = (AbstractSudoku) AbstractSudoku.demo(new ClassicSudoku(),
 				"?????64?9?3?2???1???6?7?????7???2??5?4?????2?9??6???3?????9?1???9???3?7?3?54?????");
-		AbstractSudoku result = sudoku.solve();
+		FastSudokuSolver solver = new FastSudokuSolver(sudoku);
+		Sudoku result = solver.solve();
 		System.out.println(result);
 		System.out.println("**********");
 	}

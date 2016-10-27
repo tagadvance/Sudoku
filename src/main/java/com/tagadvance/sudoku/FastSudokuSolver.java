@@ -34,13 +34,13 @@ public class FastSudokuSolver {
 		setSudoku(sudoku);
 	}
 
-	public AbstractSudoku getSudoku() {
+	public Sudoku getSudoku() {
 		return sudoku;
 	}
 
 	public void setSudoku(AbstractSudoku sudoku) {
 		Preconditions.checkNotNull(sudoku, "sudoku must not be null");
-		this.sudoku = sudoku.copy();
+		this.sudoku = (AbstractSudoku) sudoku.copy();
 	}
 
 	public AbstractSudoku solve() throws UnsolvableException {
@@ -173,7 +173,7 @@ public class FastSudokuSolver {
 		}
 		if (futureList.size() == 1) {
 			try {
-				return sudoku.solve();
+				return new FastSudokuSolver(sudoku).solve();
 			} catch (UnsolvableException e) {
 				e.printStackTrace();
 			}
@@ -203,13 +203,13 @@ public class FastSudokuSolver {
 		return null;
 	}
 
-	private List<Point> getPriorityList(AbstractSudoku sudoku) {
+	private List<Point> getPriorityList(Sudoku sudoku) {
 		List<Point> emptyCells = sudoku.getEmptyCells();
 		prioritize(sudoku, emptyCells);
 		return emptyCells;
 	}
 
-	private Map<Point, Integer> prioritize(AbstractSudoku sudoku, List<Point> emptyCells) {
+	private Map<Point, Integer> prioritize(Sudoku sudoku, List<Point> emptyCells) {
 		final Map<Point, Integer> cells = new HashMap<Point, Integer>();
 		for (Point p : emptyCells) {
 			Set<String> potentialValues = sudoku.getCellPotentialValues(p.x, p.y);
@@ -235,7 +235,7 @@ public class FastSudokuSolver {
 
 		public SudokuWorker(AbstractSudoku sudoku) {
 			super();
-			this.sudoku = sudoku.copy();
+			this.sudoku = (AbstractSudoku) sudoku.copy();
 		}
 
 		@Override
