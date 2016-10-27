@@ -61,10 +61,10 @@ public abstract class AbstractSudoku implements Sudoku  {
 	}
 
 	private void createGrid(int width, int height) {
-		Preconditions.checkArgument(width < MIN_SIZE, "width must be >= " + MIN_SIZE);
-		Preconditions.checkArgument(width > MAX_SIZE, "width must be <= " + MAX_SIZE);
-		Preconditions.checkArgument(height < MIN_SIZE, "height must be >= " + MIN_SIZE);
-		Preconditions.checkArgument(height > MAX_SIZE, "height must be <= " + MAX_SIZE);
+		Preconditions.checkArgument(width >= MIN_SIZE, "width must be >= " + MIN_SIZE);
+		Preconditions.checkArgument(width <= MAX_SIZE, "width must be <= " + MAX_SIZE);
+		Preconditions.checkArgument(height >= MIN_SIZE, "height must be >= " + MIN_SIZE);
+		Preconditions.checkArgument(height <= MAX_SIZE, "height must be <= " + MAX_SIZE);
 		this.grid = new String[height][width];
 	}
 
