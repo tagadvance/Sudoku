@@ -14,7 +14,7 @@ import java.util.Set;
 
 import com.google.common.base.Preconditions;
 
-public abstract class AbstractSudoku implements Sudoku  {
+public abstract class AbstractSudoku implements Sudoku {
 
 	public static final byte MIN_SIZE = 1, MAX_SIZE = 25;
 
@@ -116,6 +116,10 @@ public abstract class AbstractSudoku implements Sudoku  {
 		return scopes;
 	}
 
+	/**
+	 * Iterate over each of the cell's scopes and get the unused potential values common to each
+	 * scope, i.e. weed out any values that can't possibly be correct.
+	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	public Set<String> getCellPotentialValues(int x, int y) {
