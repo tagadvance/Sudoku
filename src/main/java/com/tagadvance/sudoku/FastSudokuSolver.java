@@ -18,36 +18,28 @@ import java.util.concurrent.Future;
 
 import com.google.common.base.Preconditions;
 
-public class FastSudokuSolver {
-
-	private AbstractSudoku sudoku;
+public class FastSudokuSolver implements SudokuSolver {
 
 	private ExecutorService threadPool;
 	private final Object lock = new Object();
 	private volatile boolean shutdown;
 	private volatile int callCount;
 	private long start;
-	private List<Future<AbstractSudoku>> futureList;
+	private List<Future<Sudoku>> futureList;
 
-	public FastSudokuSolver(AbstractSudoku sudoku) {
+	public FastSudokuSolver() {
 		super();
-		setSudoku(sudoku);
 	}
-
-	public Sudoku getSudoku() {
-		return sudoku;
-	}
-
-	public void setSudoku(AbstractSudoku sudoku) {
+	
+	@Override
+	public Sudoku solve(Sudoku sudoku) throws UnsolvableException {
 		Preconditions.checkNotNull(sudoku, "sudoku must not be null");
-		this.sudoku = (AbstractSudoku) sudoku.copy();
-	}
+		sudoku = sudoku.copy();
 
-	public AbstractSudoku solve() throws UnsolvableException {
 		sudoku.validate();
 
-		solveSingles();
-		List<SudokuWorker> callList = fork();
+		solveSingles(sudoku);
+		List<SudokuWorker> callList = fork(sudoku);
 
 		int callSize = callList.size();
 		System.out.println("callList.size " + callSize);
@@ -60,9 +52,9 @@ public class FastSudokuSolver {
 		callCount = 0;
 		start = System.currentTimeMillis();
 
-		this.futureList = new ArrayList<Future<AbstractSudoku>>();
-		for (Callable<AbstractSudoku> call : callList) {
-			Future<AbstractSudoku> future = threadPool.submit(call);
+		this.futureList = new ArrayList<Future<Sudoku>>();
+		for (Callable<Sudoku> call : callList) {
+			Future<Sudoku> future = threadPool.submit(call);
 			futureList.add(future);
 		}
 
@@ -70,7 +62,7 @@ public class FastSudokuSolver {
 		return join();
 	}
 
-	private void solveSingles() {
+	private void solveSingles(Sudoku sudoku) {
 		Set<Point> singles = new HashSet<Point>();
 		do {
 			singles.clear();
@@ -92,10 +84,10 @@ public class FastSudokuSolver {
 		} while (!singles.isEmpty());
 	}
 
-	private List<SudokuWorker> fork() {
+	private List<SudokuWorker> fork(Sudoku sudoku) {
 		List<SudokuWorker> callList = new ArrayList<SudokuWorker>();
 		int depth = calculateDepth();
-		fork(callList, depth);
+		fork(sudoku, callList, depth);
 		return callList;
 	}
 
@@ -103,7 +95,7 @@ public class FastSudokuSolver {
 		return 4;
 	}
 
-	private void fork(List<SudokuWorker> callList, int depth) {
+	private void fork(Sudoku sudoku, List<SudokuWorker> callList, int depth) {
 		if (depth <= 0) {
 			callList.add(new SudokuWorker(sudoku));
 			return;
@@ -115,23 +107,23 @@ public class FastSudokuSolver {
 		Set<String> potentialCellValues = sudoku.getCellPotentialValues(pt.x, pt.y);
 		for (String value : potentialCellValues) {
 			sudoku.setCellValue(pt.x, pt.y, value);
-			fork(callList, depth - 1);
+			fork(sudoku, callList, depth - 1);
 		}
 
-		sudoku.setCellValue(pt.x, pt.y, AbstractSudoku.EMPTY);
+		sudoku.setCellValue(pt.x, pt.y, Sudoku.EMPTY);
 	}
 
-	private AbstractSudoku join() {
+	private Sudoku join() {
 		while (!threadPool.isTerminated()) {
-			for (Iterator<Future<AbstractSudoku>> i = futureList.iterator(); i.hasNext();) {
-				Future<AbstractSudoku> future = i.next();
+			for (Iterator<Future<Sudoku>> i = futureList.iterator(); i.hasNext();) {
+				Future<Sudoku> future = i.next();
 				if (!future.isDone()) {
 					continue;
 				}
 
 				i.remove();
 
-				AbstractSudoku result = null;
+				Sudoku result = null;
 				try {
 					result = future.get();
 				} catch (InterruptedException e) {
@@ -164,7 +156,7 @@ public class FastSudokuSolver {
 		System.out.println((stop - start) / 1000 + " seconds");
 	}
 
-	private AbstractSudoku solve(AbstractSudoku sudoku, List<Point> cells) {
+	private Sudoku solve(Sudoku sudoku, List<Point> cells) {
 		if (shutdown) {
 			return null;
 		}
@@ -173,7 +165,7 @@ public class FastSudokuSolver {
 		}
 		if (futureList.size() == 1) {
 			try {
-				return new FastSudokuSolver(sudoku).solve();
+				return solve(sudoku);
 			} catch (UnsolvableException e) {
 				e.printStackTrace();
 			}
@@ -191,13 +183,13 @@ public class FastSudokuSolver {
 		Set<String> potentialCellValues = sudoku.getCellPotentialValues(p.x, p.y);
 		for (String value : potentialCellValues) {
 			sudoku.setCellValue(p.x, p.y, value);
-			AbstractSudoku result = solve(sudoku, null);
+			Sudoku result = solve(sudoku, null);
 			if (result != null) {
 				return result;
 			}
 		}
 
-		sudoku.setCellValue(p.x, p.y, AbstractSudoku.EMPTY);
+		sudoku.setCellValue(p.x, p.y, Sudoku.EMPTY);
 		cells.add(0, p);
 
 		return null;
@@ -229,17 +221,17 @@ public class FastSudokuSolver {
 		return cells;
 	}
 
-	private class SudokuWorker implements Callable<AbstractSudoku> {
+	private class SudokuWorker implements Callable<Sudoku> {
 
-		private AbstractSudoku sudoku;
+		private Sudoku sudoku;
 
-		public SudokuWorker(AbstractSudoku sudoku) {
+		public SudokuWorker(Sudoku sudoku) {
 			super();
-			this.sudoku = (AbstractSudoku) sudoku.copy();
+			this.sudoku = sudoku.copy();
 		}
 
 		@Override
-		public AbstractSudoku call() throws Exception {
+		public Sudoku call() throws Exception {
 			try {
 				return solve(sudoku, null);
 			} finally {

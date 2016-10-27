@@ -7,6 +7,8 @@ import java.util.Set;
 
 public interface Sudoku extends Copyable<Sudoku> {
 
+	public static final String EMPTY = "?";
+	
 	/**
 	 * 
 	 * @param x

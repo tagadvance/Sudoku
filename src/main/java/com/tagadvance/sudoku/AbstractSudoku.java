@@ -16,8 +16,6 @@ import com.google.common.base.Preconditions;
 
 public abstract class AbstractSudoku implements Sudoku  {
 
-	public static final String EMPTY = "?";
-
 	public static final byte MIN_SIZE = 1, MAX_SIZE = 25;
 
 	private String[][] grid;
