@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.google.common.base.Preconditions;
+
 @SuppressWarnings("serial")
 class RectangleScope extends Rectangle implements Scope {
 
@@ -36,9 +38,7 @@ class RectangleScope extends Rectangle implements Scope {
 	}
 
 	private void setSudoku(AbstractSudoku sudoku) {
-		if (sudoku == null) {
-			throw new IllegalArgumentException("sudoku must not be null");
-		}
+		Preconditions.checkNotNull(sudoku, "sudoku must not be null");
 		this.sudoku = sudoku;
 	}
 

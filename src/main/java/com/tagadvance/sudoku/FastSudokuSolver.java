@@ -16,6 +16,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import com.google.common.base.Preconditions;
+
 public class FastSudokuSolver {
 
 	private AbstractSudoku sudoku;
@@ -37,8 +39,7 @@ public class FastSudokuSolver {
 	}
 
 	public void setSudoku(AbstractSudoku sudoku) {
-		if (sudoku == null)
-			throw new IllegalArgumentException("sudoku must not be null");
+		Preconditions.checkNotNull(sudoku, "sudoku must not be null");
 		this.sudoku = (AbstractSudoku) sudoku.clone();
 	}
 

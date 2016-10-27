@@ -12,11 +12,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.base.Preconditions;
+
 public abstract class AbstractSudoku implements Cloneable {
 
 	public static final String EMPTY = "?";
 
-	public static final byte MIN_SIZE = 4, MAX_SIZE = 25;
+	public static final byte MIN_SIZE = 1, MAX_SIZE = 25;
 
 	private String[][] grid;
 	public final int width, height;
@@ -34,9 +36,9 @@ public abstract class AbstractSudoku implements Cloneable {
 	protected AbstractSudoku(int width, int height) {
 		super();
 
+		createGrid(width, height);
 		this.width = width;
 		this.height = height;
-		createGrid();
 
 		this.scopes = createScopes();
 		this.cellScopes = new HashMap<Point, Set<Scope>>(grid.length);
@@ -45,25 +47,24 @@ public abstract class AbstractSudoku implements Cloneable {
 	protected AbstractSudoku(AbstractSudoku parent) {
 		super();
 
-		this.width = parent.width;
-		this.height = parent.height;
-		createGrid();
+		createGrid(parent.width, parent.height);
 		for (int y = 0; y < grid.length; y++) {
 			for (int x = 0; x < grid[y].length; x++) {
 				grid[y][x] = parent.grid[y][x];
 			}
 		}
+		this.width = parent.width;
+		this.height = parent.height;
 
 		this.scopes = createScopes();
 		this.cellScopes = new HashMap<Point, Set<Scope>>(grid.length);
 	}
 
-	private void createGrid() {
-		if (width < MIN_SIZE || width > MAX_SIZE) {
-			throw new IllegalArgumentException("invalid width " + width);
-		} else if (height < MIN_SIZE || height > MAX_SIZE) {
-			throw new IllegalArgumentException("invalid height " + height);
-		}
+	private void createGrid(int width, int height) {
+		Preconditions.checkArgument(width < MIN_SIZE, "width must be >= " + MIN_SIZE);
+		Preconditions.checkArgument(width > MAX_SIZE, "width must be <= " + MAX_SIZE);
+		Preconditions.checkArgument(height < MIN_SIZE, "height must be >= " + MIN_SIZE);
+		Preconditions.checkArgument(height > MAX_SIZE, "height must be <= " + MAX_SIZE);
 		this.grid = new String[height][width];
 	}
 
