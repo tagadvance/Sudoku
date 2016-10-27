@@ -11,7 +11,7 @@ public interface Scope {
 
 	Set<Point> getEmptyCells();
 
-	Set<Character> getUnusedValues();
+	Set<String> getUnusedValues();
 
 	boolean isValid();
 

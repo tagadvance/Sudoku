@@ -14,11 +14,11 @@ import java.util.Set;
 
 public abstract class AbstractSudoku implements Cloneable {
 
-	public static final char EMPTY = '?';
+	public static final String EMPTY = "?";
 
 	public static final byte MIN_SIZE = 4, MAX_SIZE = 25;
 
-	private char[][] grid;
+	private String[][] grid;
 	public final int width, height;
 	private Set<Scope> scopes;
 	/**
@@ -61,7 +61,7 @@ public abstract class AbstractSudoku implements Cloneable {
 			throw new IllegalArgumentException("invalid width " + width);
 		else if (height < MIN_SIZE || height > MAX_SIZE)
 			throw new IllegalArgumentException("invalid height " + height);
-		this.grid = new char[height][width];
+		this.grid = new String[height][width];
 	}
 
 	/**
@@ -71,11 +71,11 @@ public abstract class AbstractSudoku implements Cloneable {
 	 * @return
 	 * @throws IndexOutOfBoundsException
 	 */
-	public char getCellValue(int x, int y) {
+	public String getCellValue(int x, int y) {
 		return this.grid[y][x];
 	}
 
-	public void setCellValue(int x, int y, char value) {
+	public void setCellValue(int x, int y, String value) {
 		this.grid[y][x] = prepareValue(value);
 	}
 
@@ -83,15 +83,15 @@ public abstract class AbstractSudoku implements Cloneable {
 	// return (y * width) + x;
 	// }
 
-	protected char prepareValue(char c) {
-		return Character.toLowerCase(c);
+	protected String prepareValue(String value) {
+		return value.toLowerCase();
 	}
 
 	public Dimension getSize() {
 		return new Dimension(width, height);
 	}
 
-	protected abstract char[] getPossibleValues();
+	protected abstract String[] getPossibleValues();
 
 	protected abstract Set<Scope> createScopes();
 
@@ -125,14 +125,14 @@ public abstract class AbstractSudoku implements Cloneable {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public Set<Character> getCellPotentialValues(int x, int y) {
+	public Set<String> getCellPotentialValues(int x, int y) {
 		Set<Scope> scopes = getScopesForCell(x, y);
-		Set<Character>[] characterSets = new Set[scopes.size()];
+		Set<String>[] stringSets = new Set[scopes.size()];
 		int i = 0;
 		for (Scope scope : scopes) {
-			characterSets[i++] = scope.getUnusedValues();
+			stringSets[i++] = scope.getUnusedValues();
 		}
-		return getCommonElements(characterSets);
+		return getCommonElements(stringSets);
 	}
 
 	public void clear() {
@@ -157,12 +157,12 @@ public abstract class AbstractSudoku implements Cloneable {
 	}
 
 	public boolean isCellEmpty(int x, int y) {
-		char value = getCellValue(x, y);
+		String value = getCellValue(x, y);
 		return isEmpty(value);
 	}
 
-	public boolean isEmpty(char value) {
-		return (value == EMPTY);
+	public boolean isEmpty(String value) {
+		return (value == null || value.isEmpty() || value.equals(EMPTY));
 	}
 
 	public boolean isValid() {
@@ -184,11 +184,12 @@ public abstract class AbstractSudoku implements Cloneable {
 		return true;
 	}
 
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				char value = getCellValue(x, y);
+				String value = getCellValue(x, y);
 				sb.append(value).append(" ");
 			}
 			sb.append("\n");
@@ -196,6 +197,7 @@ public abstract class AbstractSudoku implements Cloneable {
 		return sb.toString();
 	}
 
+	@Override
 	public Object clone() {
 		throw new UnsupportedOperationException(new CloneNotSupportedException());
 	}
@@ -219,7 +221,8 @@ public abstract class AbstractSudoku implements Cloneable {
 	public static AbstractSudoku demo(AbstractSudoku sudoku, String puzzle) {
 		int x = 0, y = 0;
 		for (int i = 0; i < puzzle.length(); i++) {
-			sudoku.setCellValue(x, y, puzzle.charAt(i));
+			String value = puzzle.substring(i, i + 1);
+			sudoku.setCellValue(x, y, value);
 			if (++x >= sudoku.width) {
 				y++;
 				x = 0;

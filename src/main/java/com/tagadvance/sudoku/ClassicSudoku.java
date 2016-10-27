@@ -15,6 +15,7 @@ class ClassicSudoku extends AbstractSudoku {
 		super(parent);
 	}
 
+	@Override
 	protected Set<Scope> createScopes() {
 		Set<Scope> scopes = new HashSet<Scope>();
 
@@ -47,10 +48,18 @@ class ClassicSudoku extends AbstractSudoku {
 		return scopes;
 	}
 
-	public char[] getPossibleValues() {
-		return "123456789".toCharArray();
+	@Override
+	public String[] getPossibleValues() {
+		String possibleValues = "123456789";
+		int length = possibleValues.length();
+		String[] result = new String[length];
+		for (int i = 0; i < length; i++) {
+			result[i] = possibleValues.substring(i, i + 1);
+		}
+		return result;
 	}
 
+	@Override
 	public Object clone() {
 		return new ClassicSudoku(this);
 	}

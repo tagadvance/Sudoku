@@ -39,6 +39,7 @@ class RectangleScope extends Rectangle implements Scope {
 		this.sudoku = sudoku;
 	}
 
+	@Override
 	public Set<Point> getEmptyCells() {
 		Set<Point> set = new HashSet<Point>();
 		for (Point cell : cells) {
@@ -48,20 +49,22 @@ class RectangleScope extends Rectangle implements Scope {
 		return set;
 	}
 
+	@Override
 	public boolean isValid() {
-		Set<Character> set = new HashSet<Character>();
+		Set<String> set = new HashSet<String>();
 		for (Point cell : cells) {
-			char value = sudoku.getCellValue(cell.x, cell.y);
+			String value = sudoku.getCellValue(cell.x, cell.y);
 			if (sudoku.isEmpty(value) && !set.add(value))
 				return false;
 		}
 		return true;
 	}
 
+	@Override
 	public void validate() throws UnsolvableException {
-		Set<Character> set = new HashSet<Character>();
+		Set<String> set = new HashSet<String>();
 		for (Point cell : cells) {
-			char value = sudoku.getCellValue(cell.x, cell.y);
+			String value = sudoku.getCellValue(cell.x, cell.y);
 			if (!sudoku.isEmpty(value) && !set.add(value)) {
 				String message = "`" + value + "` @ [x = " + cell.x + ", y = " + cell.y + "]";
 				throw new UnsolvableException(message);
@@ -69,29 +72,32 @@ class RectangleScope extends Rectangle implements Scope {
 		}
 	}
 
+	@Override
 	public boolean isSolved() {
-		Set<Character> set = new HashSet<Character>();
+		Set<String> set = new HashSet<String>();
 		for (Point cell : cells) {
-			char value = sudoku.getCellValue(cell.x, cell.y);
+			String value = sudoku.getCellValue(cell.x, cell.y);
 			if (sudoku.isEmpty(value) || !set.add(value))
 				return false;
 		}
 		return true;
 	}
 
-	public Set<Character> getUnusedValues() {
-		Set<Character> set = new HashSet<Character>();
-		char[] possibleValues = sudoku.getPossibleValues();
-		for (char c : possibleValues) {
+	@Override
+	public Set<String> getUnusedValues() {
+		Set<String> set = new HashSet<String>();
+		String[] possibleValues = sudoku.getPossibleValues();
+		for (String c : possibleValues) {
 			set.add(c);
 		}
 		for (Point cell : cells) {
-			char value = sudoku.getCellValue(cell.x, cell.y);
+			String value = sudoku.getCellValue(cell.x, cell.y);
 			set.remove(value);
 		}
 		return set;
 	}
 
+	@Override
 	public String toString() {
 		return getBounds().toString();
 	}

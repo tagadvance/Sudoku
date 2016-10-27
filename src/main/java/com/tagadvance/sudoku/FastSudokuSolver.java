@@ -83,9 +83,9 @@ public class FastSudokuSolver {
 					singles.add(pt);
 			}
 			for (Point pt : singles) {
-				Set<Character> set = sudoku.getCellPotentialValues(pt.x, pt.y);
-				char c = set.iterator().next();
-				sudoku.setCellValue(pt.x, pt.y, c);
+				Set<String> set = sudoku.getCellPotentialValues(pt.x, pt.y);
+				String value = set.iterator().next();
+				sudoku.setCellValue(pt.x, pt.y, value);
 			}
 		} while (!singles.isEmpty());
 	}
@@ -110,8 +110,8 @@ public class FastSudokuSolver {
 		List<Point> priorityList = getPriorityList(sudoku);
 		Point pt = priorityList.get(0);
 
-		Set<Character> potentialCellValues = sudoku.getCellPotentialValues(pt.x, pt.y);
-		for (Character value : potentialCellValues) {
+		Set<String> potentialCellValues = sudoku.getCellPotentialValues(pt.x, pt.y);
+		for (String value : potentialCellValues) {
 			sudoku.setCellValue(pt.x, pt.y, value);
 			fork(callList, depth - 1);
 		}
@@ -181,8 +181,8 @@ public class FastSudokuSolver {
 
 		Point p = cells.remove(0);
 
-		Set<Character> potentialCellValues = sudoku.getCellPotentialValues(p.x, p.y);
-		for (Character value : potentialCellValues) {
+		Set<String> potentialCellValues = sudoku.getCellPotentialValues(p.x, p.y);
+		for (String value : potentialCellValues) {
 			sudoku.setCellValue(p.x, p.y, value);
 			AbstractSudoku result = solve(sudoku, null);
 			if (result != null)
@@ -204,13 +204,14 @@ public class FastSudokuSolver {
 	private Map<Point, Integer> prioritize(AbstractSudoku sudoku, List<Point> emptyCells) {
 		final Map<Point, Integer> cells = new HashMap<Point, Integer>();
 		for (Point p : emptyCells) {
-			Set<Character> potentialValues = sudoku.getCellPotentialValues(p.x, p.y);
+			Set<String> potentialValues = sudoku.getCellPotentialValues(p.x, p.y);
 			int size = potentialValues.size();
 			cells.put(p, size);
 			potentialValues.clear();
 		}
 		// sort from least to greatest
 		Collections.sort(emptyCells, new Comparator<Point>() {
+			@Override
 			public int compare(Point p1, Point p2) {
 				int size1 = cells.get(p1);
 				int size2 = cells.get(p2);
