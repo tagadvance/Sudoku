@@ -5,6 +5,7 @@ This is a sudoku solver I originally wrote in April of 2012 (based on the last m
 
 ## Algorithm
 The algorithm works roughly like this:
+
 1. If the sudoku is solved, return immediately.
 1. Ensure that the sudoku is in a valid state.
 2. Identify cells with 1 possible answer and insert the correct value.
