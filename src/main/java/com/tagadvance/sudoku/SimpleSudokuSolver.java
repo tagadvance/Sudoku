@@ -33,11 +33,11 @@ public class SimpleSudokuSolver implements SudokuSolver {
 		try {
 			return solve(sudoku, null);
 		} finally {
-			print();
+			printMetrics();
 		}
 	}
 
-	private void print() {
+	private void printMetrics() {
 		System.out.println("callCount = " + callCount);
 		double stop = System.currentTimeMillis();
 		System.out.println((stop - start) / 1000 + " seconds");
