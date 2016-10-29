@@ -72,7 +72,7 @@ public class SudokuSolverTest {
 	}
 
 	@Test
-	public void simpleSolveReturnsSolvedSudoku() throws IOException, UnsolvableException {
+	public void solveReturnsSolvedSudoku() throws IOException, UnsolvableException {
 		Sudoku solvedSudoku = solver.solve(sudoku);
 		Assert.assertTrue(solvedSudoku.isSolved());
 	}
