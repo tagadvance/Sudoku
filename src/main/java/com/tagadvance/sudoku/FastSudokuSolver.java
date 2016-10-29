@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +37,6 @@ public class FastSudokuSolver implements SudokuSolver {
 
 		sudoku.validate();
 
-		solveSingles(sudoku);
 		List<SudokuWorker> callList = fork(sudoku);
 
 		int callSize = callList.size();
@@ -60,28 +58,6 @@ public class FastSudokuSolver implements SudokuSolver {
 
 		threadPool.shutdown();
 		return join();
-	}
-
-	private void solveSingles(Sudoku sudoku) {
-		Set<Point> singles = new HashSet<Point>();
-		do {
-			singles.clear();
-
-			List<Point> emptyCells = sudoku.getEmptyCells();
-			Map<Point, Integer> priorityMap = prioritize(sudoku, emptyCells);
-			for (Map.Entry<Point, Integer> entry : priorityMap.entrySet()) {
-				Point pt = entry.getKey();
-				int potential = entry.getValue();
-				if (potential == 1) {
-					singles.add(pt);
-				}
-			}
-			for (Point pt : singles) {
-				Set<String> set = sudoku.getCellPotentialValues(pt.x, pt.y);
-				String value = set.iterator().next();
-				sudoku.setCellValue(pt.x, pt.y, value);
-			}
-		} while (!singles.isEmpty());
 	}
 
 	private List<SudokuWorker> fork(Sudoku sudoku) {
