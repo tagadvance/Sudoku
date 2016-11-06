@@ -1,15 +1,15 @@
 # Sudoku
 Sudoku solving algorithm written in Java.
 
-This is a sudoku solver I originally wrote in April of 2012 (based on the last modified date). I'll be refactoring it over the next few days to improve the quality of code.
+This is a sudoku solver I originally wrote in April of 2012 (based on the last modified date).
 
 ## Algorithm
 The algorithm works roughly like this:
 
-1. If the sudoku is solved, return immediately.
-1. Ensure that the sudoku is in a valid state.
-2. Identify cells with 1 possible answer and insert the correct value.
-3. Sort remaining cells in order of fewest number of possible values to greatest number of possible values.
-4. Recursively iterate over each cell, repeating the above steps, until a solution is found.
-
-The actual implementation is a bit more complicated that that because an [ExecutorService](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ExecutorService.html) is used to increase performance.
+1. Make a copy of the sudoku.
+1. If the sudoku is in an invalid state, throw an UnsolvableException.
+1. If the sudoku is solved, return the solved puzzle immediately.
+1. Retrieve and sort empty cells in order of fewest number of possible values to greatest number of possible values.
+1. For each cell, iterate over the possible values and assign the value to the cell.
+1. After a value is assigned, recurse to step 1, until a solution is found.
+1. If no solution is found, throw an UnsolvableException.
