@@ -61,7 +61,7 @@ public class SudokuSolverTest {
 		}
 
 		List<Object[]> list = new ArrayList<>();
-		SudokuSolver[] solvers = {new SimpleSudokuSolver()/* , new FastSudokuSolver() */};
+		SudokuSolver[] solvers = {new SimpleSudokuSolver(), new ForkJoinSudokuSolver()};
 		for (SudokuSolver solver : solvers) {
 			for (Grid<Integer> betaGrid : gridList) {
 				list.add(new Object[] {solver, sudoku, betaGrid});

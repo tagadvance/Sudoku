@@ -10,6 +10,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.collect.ImmutableSet;
@@ -17,9 +20,9 @@ import com.tagadvance.geometry.ImmutableDimension;
 import com.tagadvance.geometry.ImmutablePoint;
 import com.tagadvance.geometry.Point;
 
-public class SimpleSudokuSolver implements SudokuSolver {
+public class ForkJoinSudokuSolver implements SudokuSolver {
 
-	public SimpleSudokuSolver() {
+	public ForkJoinSudokuSolver() {
 		super();
 	}
 
@@ -28,8 +31,18 @@ public class SimpleSudokuSolver implements SudokuSolver {
 		checkNotNull(sudoku, "sudoku must not be null");
 		checkNotNull(grid, "grid must not be null");
 
-		InternalSudokuSolver<V> solver = new InternalSudokuSolver<>(sudoku, grid);
-		Solution<V> solution = solver.solve();
+		ForkJoinPool pool = ForkJoinPool.commonPool();
+
+		// TODO: copy grid
+
+		Solution<V> solution = new Solution<>();
+		solution.start();
+		int depth = 0;
+		SudokuSolverRecursiveTask<V> solver =
+				new SudokuSolverRecursiveTask<>(sudoku, grid, solution, depth, new AtomicBoolean());
+		pool.invoke(solver);
+		solution.stop();
+
 		System.out.println(solution);
 		if (solution.grid == null) {
 			throw new UnsolvableException();
@@ -37,34 +50,51 @@ public class SimpleSudokuSolver implements SudokuSolver {
 		return solution.grid;
 	}
 
-	private class InternalSudokuSolver<V> {
+	@SuppressWarnings("serial")
+	private class SudokuSolverRecursiveTask<V> extends RecursiveTask<Void> {
+
+		private static final int FORK_DEPTH = 4;
+
+		private final List<RecursiveTask<Void>> tasks = new ArrayList<>();
 
 		private final Sudoku<V> sudoku;
-		private final Grid<V> alphaGrid;
-
+		private final Grid<V> grid;
 		private final Solution<V> solution;
+		private int depth;
+		private final AtomicBoolean interrupt;
 
-		public InternalSudokuSolver(Sudoku<V> sudoku, Grid<V> grid) {
+		public SudokuSolverRecursiveTask(Sudoku<V> sudoku, Grid<V> grid, Solution<V> solution,
+				int depth, AtomicBoolean interrupt) {
 			super();
 			this.sudoku = sudoku;
-			this.alphaGrid = grid.copy();
-
-			this.solution = new Solution<V>();
+			this.grid = grid;
+			this.solution = solution;
+			this.depth = depth;
+			this.interrupt = interrupt;
 		}
 
-		public Solution<V> solve() throws UnsolvableException {
-			solution.start();
-
-			if (!sudoku.isValid(alphaGrid)) {
-				throw new UnsolvableException("sudoku is not in a valid state");
+		@Override
+		protected Void compute() {
+			if (sudoku.isValid(grid)) {
+				Grid<V> result = solve(grid, depth);
+				if (result != null) {
+					solution.grid = grid;
+					interrupt.set(true);
+				}
+				joinAll();
+			} else {
+				// throw new UnsolvableException("sudoku is not in a valid state");
 			}
 
-			solve(alphaGrid);
-
-			return solution;
+			return null;
 		}
 
-		private Grid<V> solve(Grid<V> grid) {
+		private Grid<V> solve(Grid<V> grid, int depth) {
+			// another task already found the solution
+			if (interrupt.get()) {
+				return null;
+			}
+
 			if (sudoku.isSolved(grid)) {
 				return grid;
 			}
@@ -85,19 +115,30 @@ public class SimpleSudokuSolver implements SudokuSolver {
 			Cell<V> cell = grid.getCellAt(point);
 			for (V value : potentialCellValues) {
 				cell.setValue(value);
-				Grid<V> result = solve(grid);
-				if (result != null) {
-					if (solution.grid == null) {
-						solution.grid = result;
-						solution.stop();
+
+				if (depth == FORK_DEPTH) {
+					Grid<V> clone = grid.copy();
+					SudokuSolverRecursiveTask<V> task = new SudokuSolverRecursiveTask<>(sudoku,
+							clone, solution, depth++, interrupt);
+					tasks.add(task);
+					task.fork();
+				} else {
+					Grid<V> result = solve(grid, depth++);
+					if (result != null) {
+						return result;
 					}
-					return result;
 				}
 			}
 
 			cell.setValue(null);
 
 			return null;
+		}
+
+		private void joinAll() {
+			for (RecursiveTask<Void> task : tasks) {
+				task.join();
+			}
 		}
 
 		private List<ImmutablePoint> getPrioritizedCellList(Grid<V> grid) {
