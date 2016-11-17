@@ -32,7 +32,7 @@ public class Main {
 		System.out.println(grid);
 		System.out.println();
 		System.out.println();
-		
+
 		SudokuSolver solver = new SimpleSudokuSolver();
 		Grid<Integer> result = solver.solve(sudoku, grid);
 		System.out.println(result);

@@ -19,7 +19,7 @@ public class IntegerSudokuParser implements SudokuParser<Integer> {
 				Integer integer = Integer.parseInt(value);
 				cell.setValue(integer);
 			} catch (NumberFormatException e) {
-				//e.printStackTrace();
+				// e.printStackTrace();
 			}
 			if (++x >= size.getWidth()) {
 				y++;

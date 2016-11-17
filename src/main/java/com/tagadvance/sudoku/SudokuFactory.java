@@ -1,7 +1,7 @@
 package com.tagadvance.sudoku;
 
-public interface SudokuFactory {
+public interface SudokuFactory<V> {
 
-	public Sudoku createEmptySudoku();
+	public Sudoku<V> createEmptySudoku();
 
 }

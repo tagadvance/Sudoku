@@ -12,7 +12,7 @@ public interface Sudoku<V> extends Copyable<Sudoku<V>> {
 	ImmutableSet<Scope<V>> getScopesForPoint(ImmutablePoint point);
 
 	boolean isValid(Grid<V> grid);
- 
+
 	boolean isSolved(Grid<V> grid);
 
 }
