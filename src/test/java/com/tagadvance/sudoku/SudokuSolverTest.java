@@ -32,8 +32,7 @@ public class SudokuSolverTest {
 
 		int width = 9, height = 9;
 		ImmutableDimension size = new Dimension(width, height);
-		ImmutableSet<Integer> emptyValues = ImmutableSet.of(0);
-		CellFactory<Integer> cellFactory = new EmptyCellFactory<>(emptyValues);
+		CellFactory<Integer> cellFactory = new EmptyCellFactory<>();
 
 		ScopeFactory scopeFactory = new SquareRootScopeFactory();
 		Grid<Integer> alphaGrid = new FixedSizeGrid<>(size, cellFactory);
