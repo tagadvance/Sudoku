@@ -18,8 +18,7 @@ public class Main {
 
 		int width = 9, height = 9;
 		ImmutableDimension size = new Dimension(width, height);
-		ImmutableSet<Integer> emptyValues = ImmutableSet.of(0);
-		CellFactory<Integer> cellFactory = new EmptyCellFactory<>(emptyValues);
+		CellFactory<Integer> cellFactory = new EmptyCellFactory<>();
 		Grid<Integer> grid = new FixedSizeGrid<>(size, cellFactory);
 		ScopeFactory scopeFactory = new SquareRootScopeFactory();
 		ImmutableSet<Scope<Integer>> scopes = scopeFactory.createScopes(grid);
