@@ -2,6 +2,6 @@ package com.tagadvance.sudoku;
 
 public interface SudokuSolver {
 
-	public Sudoku solve(Sudoku sudoku) throws UnsolvableException;
+	public <V> Grid<V> solve(Sudoku<V> sudoku, Grid<V> grid) throws UnsolvableException;
 
 }

@@ -1,7 +1,7 @@
 package com.tagadvance.sudoku;
 
-public interface SudokuParser {
+public interface SudokuParser<V> {
 
-	public void populateSudokuFromString(Sudoku sudoku, String s);
+	public void populateSudokuFromString(Grid<V> sudoku, String s);
 
 }

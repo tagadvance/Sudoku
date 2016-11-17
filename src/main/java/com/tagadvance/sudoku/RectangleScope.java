@@ -1,64 +1,64 @@
 package com.tagadvance.sudoku;
 
-import java.awt.Point;
 import java.awt.Rectangle;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
+import com.tagadvance.geometry.ImmutablePoint;
+import com.tagadvance.geometry.Point;
 
 @SuppressWarnings("serial")
-class RectangleScope extends Rectangle implements Scope {
+class RectangleScope<V> extends Rectangle implements Scope<V> {
 
-	private AbstractSudoku sudoku;
-	private final Set<Point> cells;
+	private final ImmutableSet<ImmutablePoint> pointSet;
 
-	public RectangleScope(AbstractSudoku sudoku, int x, int y, int width, int height) {
+	public RectangleScope(int x, int y, int width, int height) {
 		super(x, y, width, height);
-		setSudoku(sudoku);
 
-		Set<Point> cells = new HashSet<Point>();
+		List<ImmutablePoint> pointList = new ArrayList<>();
 		for (int y2 = y; y2 < y + height; y2++) {
 			for (int x2 = x; x2 < x + width; x2++) {
-				cells.add(new Point(x2, y2));
+				ImmutablePoint point = new Point(x2, y2);
+				pointList.add(point);
 			}
 		}
-		this.cells = Collections.unmodifiableSet(cells);
+		this.pointSet = ImmutableSet.copyOf(pointList);
+	}
+
+	// TODO: see if this is ever called
+	@Override
+	public ImmutableSet<ImmutablePoint> getCellPoints() {
+		return this.pointSet;
 	}
 
 	@Override
-	public boolean containsCell(Point p) {
-		return this.cells.contains(p);
-	}
-
-	@Override
-	public Set<Point> getCells() {
-		return this.cells;
-	}
-
-	private void setSudoku(AbstractSudoku sudoku) {
-		Preconditions.checkNotNull(sudoku, "sudoku must not be null");
-		this.sudoku = sudoku;
-	}
-
-	@Override
-	public Set<Point> getEmptyCells() {
-		Set<Point> set = new HashSet<Point>();
-		for (Point cell : cells) {
-			if (sudoku.isCellEmpty(cell.x, cell.y)) {
-				set.add(new Point(cell));
+	public Set<V> getUsedValues(Grid<V> grid) {
+		Set<V> set = new HashSet<>();
+		for (ImmutablePoint point : pointSet) {
+			Cell<V> cell = grid.getCellAt(point);
+			if (!cell.isEmpty()) {
+				V value = cell.getValue();
+				set.add(value);
 			}
 		}
 		return set;
 	}
 
 	@Override
-	public boolean isValid() {
-		Set<String> set = new HashSet<String>();
-		for (Point cell : cells) {
-			String value = sudoku.getCellValue(cell.x, cell.y);
-			if (sudoku.isEmpty(value) && !set.add(value)) {
+	public boolean isValid(Grid<V> grid) {
+		Set<V> set = new HashSet<>();
+		for (ImmutablePoint point : pointSet) {
+			Cell<V> cell = grid.getCellAt(point);
+			if (cell.isEmpty()) {
+				continue;
+			}
+
+			V value = cell.getValue();
+			if (!set.add(value)) {
+				System.err.printf("%s could not be added to set%n", value);
 				return false;
 			}
 		}
@@ -66,41 +66,16 @@ class RectangleScope extends Rectangle implements Scope {
 	}
 
 	@Override
-	public void validate() throws UnsolvableException {
-		Set<String> set = new HashSet<String>();
-		for (Point cell : cells) {
-			String value = sudoku.getCellValue(cell.x, cell.y);
-			if (!sudoku.isEmpty(value) && !set.add(value)) {
-				String message = "`" + value + "` @ [x = " + cell.x + ", y = " + cell.y + "]";
-				throw new UnsolvableException(message);
-			}
-		}
-	}
-
-	@Override
-	public boolean isSolved() {
-		Set<String> set = new HashSet<String>();
-		for (Point cell : cells) {
-			String value = sudoku.getCellValue(cell.x, cell.y);
-			if (sudoku.isEmpty(value) || !set.add(value)) {
+	public boolean isSolved(Grid<V> grid) {
+		Set<V> set = new HashSet<>();
+		for (ImmutablePoint point : pointSet) {
+			Cell<V> cell = grid.getCellAt(point);
+			V value = cell.getValue();
+			if (cell.isEmpty() || !set.add(value)) {
 				return false;
 			}
 		}
 		return true;
-	}
-
-	@Override
-	public Set<String> getUnusedValues() {
-		Set<String> set = new HashSet<String>();
-		String[] possibleValues = sudoku.getPossibleValues();
-		for (String c : possibleValues) {
-			set.add(c);
-		}
-		for (Point cell : cells) {
-			String value = sudoku.getCellValue(cell.x, cell.y);
-			set.remove(value);
-		}
-		return set;
 	}
 
 	@Override

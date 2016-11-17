@@ -1,22 +1,18 @@
 package com.tagadvance.sudoku;
 
-import java.awt.Point;
 import java.util.Set;
 
-public interface Scope {
+import com.google.common.collect.ImmutableSet;
+import com.tagadvance.geometry.ImmutablePoint;
 
-	boolean containsCell(Point p);
+public interface Scope<V> {
 
-	Set<Point> getCells();
+	ImmutableSet<ImmutablePoint> getCellPoints();
 
-	Set<Point> getEmptyCells();
+	Set<V> getUsedValues(Grid<V> grid);
 
-	Set<String> getUnusedValues();
+	boolean isValid(Grid<V> grid);
 
-	boolean isValid();
-
-	void validate() throws UnsolvableException;
-
-	boolean isSolved();
+	boolean isSolved(Grid<V> grid);
 
 }
