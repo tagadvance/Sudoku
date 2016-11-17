@@ -8,8 +8,11 @@ import com.google.common.collect.ImmutableSet;
 import com.tagadvance.geometry.Dimension;
 import com.tagadvance.geometry.ImmutableDimension;
 
+/**
+ * Factory dependencies are hard-coded until I can refactor this into a step builder.
+ */
 public class SudokuBuilder {
-	
+
 	private final CellFactory<Integer> cellFactory;
 	private final ScopeFactory scopeFactory;
 
@@ -18,15 +21,15 @@ public class SudokuBuilder {
 		this.scopeFactory = new SquareRootScopeFactory();
 	}
 
-	public SudokuBuilder newBuilder() {
+	public static SudokuBuilder newBuilder() {
 		return new SudokuBuilder();
 	}
-	
-	public createClassicSudokuFactory() {
+
+	public SudokuFactory<Integer> createClassicSudokuFactory() {
 		return new ClassicSudokuFactory(cellFactory, scopeFactory);
 	}
 
-	private static interface SudokuFactory<V> {
+	public static interface SudokuFactory<V> {
 
 		public Grid<V> createEmptyGrid();
 
