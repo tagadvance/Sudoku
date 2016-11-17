@@ -14,8 +14,6 @@ import com.tagadvance.geometry.ImmutablePoint;
 
 public class CompositeSudoku<V> implements Sudoku<V> {
 
-	public static final byte MIN_SIZE = 1, MAX_SIZE = 25;
-
 	private final ImmutableSet<V> values;
 	private final ImmutableSet<Scope<V>> scopeSet;
 
