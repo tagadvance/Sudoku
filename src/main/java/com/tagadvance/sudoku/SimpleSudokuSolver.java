@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.collect.ImmutableSet;
 import com.tagadvance.geometry.ImmutableDimension;
@@ -24,17 +23,12 @@ public class SimpleSudokuSolver implements SudokuSolver {
 	}
 
 	@Override
-	public <V> Grid<V> solve(Sudoku<V> sudoku, Grid<V> grid) throws UnsolvableException {
+	public <V> Solution<V> solve(Sudoku<V> sudoku, Grid<V> grid) {
 		checkNotNull(sudoku, "sudoku must not be null");
 		checkNotNull(grid, "grid must not be null");
 
 		InternalSudokuSolver<V> solver = new InternalSudokuSolver<>(sudoku, grid);
-		Solution<V> solution = solver.solve();
-		System.out.println(solution);
-		if (solution.grid == null) {
-			throw new UnsolvableException();
-		}
-		return solution.grid;
+		return solver.solve();
 	}
 
 	private class InternalSudokuSolver<V> {
@@ -42,26 +36,36 @@ public class SimpleSudokuSolver implements SudokuSolver {
 		private final Sudoku<V> sudoku;
 		private final Grid<V> alphaGrid;
 
-		private final Solution<V> solution;
+		private final AtomicSolution<V> solution;
 
 		public InternalSudokuSolver(Sudoku<V> sudoku, Grid<V> grid) {
 			super();
 			this.sudoku = sudoku;
 			this.alphaGrid = grid.copy();
 
-			this.solution = new Solution<V>();
+			this.solution = new AtomicSolution<V>();
 		}
 
-		public Solution<V> solve() throws UnsolvableException {
+		public Solution<V> solve() {
 			solution.start();
 
-			if (!sudoku.isValid(alphaGrid)) {
-				throw new UnsolvableException("sudoku is not in a valid state");
+			try {
+				if (!sudoku.isValid(alphaGrid)) {
+					UnsolvableException e =
+							new UnsolvableException("sudoku is not in a valid state");
+					solution.setException(e);
+					return solution;
+				}
+
+				Grid<V> grid = solve(alphaGrid);
+				if (grid != null) {
+					solution.setSolution(grid);
+				}
+
+				return solution;
+			} finally {
+				solution.stop();
 			}
-
-			solve(alphaGrid);
-
-			return solution;
 		}
 
 		private Grid<V> solve(Grid<V> grid) {
@@ -87,10 +91,6 @@ public class SimpleSudokuSolver implements SudokuSolver {
 				cell.setValue(value);
 				Grid<V> result = solve(grid);
 				if (result != null) {
-					if (solution.grid == null) {
-						solution.grid = result;
-						solution.stop();
-					}
 					return result;
 				}
 			}
@@ -161,46 +161,6 @@ public class SimpleSudokuSolver implements SudokuSolver {
 			// System.out.println("values: " + Joiner.on(' ').join(potentialValues));
 
 			return potentialValues;
-		}
-
-	}
-
-	private class Solution<V> {
-
-		private AtomicInteger iterations;
-		private long start;
-		private long stop;
-
-		private Grid<V> grid;
-
-		public Solution() {
-			super();
-			this.iterations = new AtomicInteger();
-			this.start = System.currentTimeMillis();
-		}
-
-		public void start() {
-			this.start = System.currentTimeMillis();
-		}
-
-		public void stop() {
-			this.stop = System.currentTimeMillis();
-		}
-
-		@Override
-		public String toString() {
-			StringBuilder sb = new StringBuilder();
-			sb.append("iterations = " + iterations);
-			if (start < stop) {
-				sb.append("\r\n"); // TODO
-				double seconds = calculateElapsedSeconds();
-				sb.append(seconds + " seconds");
-			}
-			return sb.toString();
-		}
-
-		private double calculateElapsedSeconds() {
-			return (stop - start) / 1000d;
 		}
 
 	}

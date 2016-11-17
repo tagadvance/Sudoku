@@ -89,7 +89,8 @@ public class SudokuSolverTest {
 
 	@Test
 	public void solveReturnsSolvedSudoku() throws IOException, UnsolvableException {
-		Grid<Integer> grid = solver.solve(sudoku, this.grid);
+		Solution<Integer> solution = solver.solve(sudoku, this.grid);
+		Grid<Integer> grid = solution.getSolution();
 		Assert.assertTrue(sudoku.isSolved(grid));
 	}
 

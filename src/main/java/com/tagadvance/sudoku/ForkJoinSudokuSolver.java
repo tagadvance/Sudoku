@@ -13,7 +13,6 @@ import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.collect.ImmutableSet;
 import com.tagadvance.geometry.ImmutableDimension;
@@ -27,7 +26,7 @@ public class ForkJoinSudokuSolver implements SudokuSolver {
 	}
 
 	@Override
-	public <V> Grid<V> solve(Sudoku<V> sudoku, Grid<V> grid) throws UnsolvableException {
+	public <V> Solution<V> solve(Sudoku<V> sudoku, Grid<V> grid) {
 		checkNotNull(sudoku, "sudoku must not be null");
 		checkNotNull(grid, "grid must not be null");
 
@@ -35,19 +34,17 @@ public class ForkJoinSudokuSolver implements SudokuSolver {
 
 		// TODO: copy grid
 
-		Solution<V> solution = new Solution<>();
+		AtomicSolution<V> solution = new AtomicSolution<>();
 		solution.start();
 		int depth = 0;
-		SudokuSolverRecursiveTask<V> solver =
-				new SudokuSolverRecursiveTask<>(sudoku, grid, solution, depth, new AtomicBoolean());
-		pool.invoke(solver);
-		solution.stop();
-
-		System.out.println(solution);
-		if (solution.grid == null) {
-			throw new UnsolvableException();
+		try {
+			SudokuSolverRecursiveTask<V> solver = new SudokuSolverRecursiveTask<>(sudoku, grid,
+					solution, depth, new AtomicBoolean());
+			pool.invoke(solver);
+			return solution;
+		} finally {
+			solution.stop();
 		}
-		return solution.grid;
 	}
 
 	@SuppressWarnings("serial")
@@ -59,11 +56,11 @@ public class ForkJoinSudokuSolver implements SudokuSolver {
 
 		private final Sudoku<V> sudoku;
 		private final Grid<V> grid;
-		private final Solution<V> solution;
+		private final AtomicSolution<V> solution;
 		private int depth;
 		private final AtomicBoolean interrupt;
 
-		public SudokuSolverRecursiveTask(Sudoku<V> sudoku, Grid<V> grid, Solution<V> solution,
+		public SudokuSolverRecursiveTask(Sudoku<V> sudoku, Grid<V> grid, AtomicSolution<V> solution,
 				int depth, AtomicBoolean interrupt) {
 			super();
 			this.sudoku = sudoku;
@@ -78,13 +75,14 @@ public class ForkJoinSudokuSolver implements SudokuSolver {
 			if (sudoku.isValid(grid)) {
 				Grid<V> result = solve(grid, depth);
 				if (result != null) {
-					solution.grid = grid;
+					solution.setSolution(result);
 					interrupt.set(true);
 				}
-				joinAll();
 			} else {
-				// throw new UnsolvableException("sudoku is not in a valid state");
+				UnsolvableException e = new UnsolvableException("sudoku is not in a valid state");
+				solution.setException(e);
 			}
+			joinAll(); 
 
 			return null;
 		}
@@ -202,46 +200,6 @@ public class ForkJoinSudokuSolver implements SudokuSolver {
 			// System.out.println("values: " + Joiner.on(' ').join(potentialValues));
 
 			return potentialValues;
-		}
-
-	}
-
-	private class Solution<V> {
-
-		private AtomicInteger iterations;
-		private long start;
-		private long stop;
-
-		private Grid<V> grid;
-
-		public Solution() {
-			super();
-			this.iterations = new AtomicInteger();
-			this.start = System.currentTimeMillis();
-		}
-
-		public void start() {
-			this.start = System.currentTimeMillis();
-		}
-
-		public void stop() {
-			this.stop = System.currentTimeMillis();
-		}
-
-		@Override
-		public String toString() {
-			StringBuilder sb = new StringBuilder();
-			sb.append("iterations = " + iterations);
-			if (start < stop) {
-				sb.append("\r\n"); // TODO
-				double seconds = calculateElapsedSeconds();
-				sb.append(seconds + " seconds");
-			}
-			return sb.toString();
-		}
-
-		private double calculateElapsedSeconds() {
-			return (stop - start) / 1000d;
 		}
 
 	}
