@@ -35,8 +35,8 @@ public class SudokuSolverTest {
 		CellFactory<Integer> cellFactory = new EmptyCellFactory<>();
 
 		ScopeFactory scopeFactory = new SquareRootScopeFactory();
-		Grid<Integer> alphaGrid = new FixedSizeGrid<>(size, cellFactory);
-		ImmutableSet<Scope<Integer>> scopes = scopeFactory.createScopes(alphaGrid);
+		Grid<Integer> grid = new FixedSizeGrid<>(size, cellFactory);
+		ImmutableSet<Scope<Integer>> scopes = scopeFactory.createScopes(grid);
 		Sudoku<Integer> sudoku = new CompositeSudoku<>(values, scopes);
 
 		SudokuParser<Integer> parser = new IntegerSudokuParser();
@@ -53,7 +53,7 @@ public class SudokuSolverTest {
 					continue;
 				}
 
-				Grid<Integer> puzzleGrid = alphaGrid.copy();
+				Grid<Integer> puzzleGrid = grid.copy();
 				parser.populateSudokuFromString(puzzleGrid, line);
 
 				gridList.add(puzzleGrid);
