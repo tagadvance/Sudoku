@@ -20,6 +20,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.testing.NullPointerTester;
 import com.tagadvance.geometry.Dimension;
 import com.tagadvance.geometry.ImmutableDimension;
+import com.tagadvance.sudoku.ForkJoinSudokuSolver.CubicRootForkDepthCalculator;
+import com.tagadvance.sudoku.ForkJoinSudokuSolver.ForkDepthCalculator;
 
 
 @RunWith(value = Parameterized.class)
@@ -61,7 +63,8 @@ public class SudokuSolverTest {
 		}
 
 		List<Object[]> list = new ArrayList<>();
-		SudokuSolver[] solvers = {new SimpleSudokuSolver(), new ForkJoinSudokuSolver()};
+		ForkDepthCalculator calculator = new CubicRootForkDepthCalculator();
+		SudokuSolver[] solvers = {new SimpleSudokuSolver(), new ForkJoinSudokuSolver(calculator)};
 		for (SudokuSolver solver : solvers) {
 			for (Grid<Integer> betaGrid : gridList) {
 				list.add(new Object[] {solver, sudoku, betaGrid});

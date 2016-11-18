@@ -21,8 +21,13 @@ import com.tagadvance.geometry.Point;
 
 public class ForkJoinSudokuSolver implements SudokuSolver {
 
-	public ForkJoinSudokuSolver() {
+	private static final int MINIMUM_FORK_DEPTH = 1;
+
+	private final ForkDepthCalculator calculator;
+
+	public ForkJoinSudokuSolver(ForkDepthCalculator calculator) {
 		super();
+		this.calculator = calculator;
 	}
 
 	@Override
@@ -32,7 +37,7 @@ public class ForkJoinSudokuSolver implements SudokuSolver {
 
 		ForkJoinPool pool = ForkJoinPool.commonPool();
 
-		// TODO: copy grid
+		// TODO: defensive copy of grid
 
 		AtomicSolution<V> solution = new AtomicSolution<>();
 		solution.start();
@@ -47,10 +52,28 @@ public class ForkJoinSudokuSolver implements SudokuSolver {
 		}
 	}
 
+	public static interface ForkDepthCalculator {
+
+		public <V> int calculateForkDepth(Grid<V> grid);
+
+	}
+
+	public static class CubicRootForkDepthCalculator implements ForkDepthCalculator {
+
+		@Override
+		public <V> int calculateForkDepth(Grid<V> grid) {
+			ImmutableDimension size = grid.getSize();
+			int width = size.getWidth(), height = size.getHeight();
+			int area = width * height;
+			double cubicRoot = Math.cbrt(area);
+			int floor = (int) Math.floor(cubicRoot);
+			return Math.max(MINIMUM_FORK_DEPTH, floor);
+		}
+
+	}
+
 	@SuppressWarnings("serial")
 	private class SudokuSolverRecursiveTask<V> extends RecursiveTask<Void> {
-
-		private static final int FORK_DEPTH = 4;
 
 		private final List<RecursiveTask<Void>> tasks = new ArrayList<>();
 
@@ -60,6 +83,8 @@ public class ForkJoinSudokuSolver implements SudokuSolver {
 		private int depth;
 		private final AtomicBoolean interrupt;
 
+		private int forkDepth;
+
 		public SudokuSolverRecursiveTask(Sudoku<V> sudoku, Grid<V> grid, AtomicSolution<V> solution,
 				int depth, AtomicBoolean interrupt) {
 			super();
@@ -68,6 +93,8 @@ public class ForkJoinSudokuSolver implements SudokuSolver {
 			this.solution = solution;
 			this.depth = depth;
 			this.interrupt = interrupt;
+
+			forkDepth = calculator.calculateForkDepth(grid);
 		}
 
 		@Override
@@ -82,7 +109,7 @@ public class ForkJoinSudokuSolver implements SudokuSolver {
 				UnsolvableException e = new UnsolvableException("sudoku is not in a valid state");
 				solution.setException(e);
 			}
-			joinAll(); 
+			joinAll();
 
 			return null;
 		}
@@ -96,7 +123,7 @@ public class ForkJoinSudokuSolver implements SudokuSolver {
 			if (sudoku.isSolved(grid)) {
 				return grid;
 			}
-			
+
 			if (!sudoku.isValid(grid)) {
 				return null;
 			}
@@ -114,7 +141,7 @@ public class ForkJoinSudokuSolver implements SudokuSolver {
 			for (V value : potentialCellValues) {
 				cell.setValue(value);
 
-				if (depth == FORK_DEPTH) {
+				if (depth == forkDepth) {
 					Grid<V> clone = grid.copy();
 					SudokuSolverRecursiveTask<V> task = new SudokuSolverRecursiveTask<>(sudoku,
 							clone, solution, depth++, interrupt);
@@ -128,6 +155,7 @@ public class ForkJoinSudokuSolver implements SudokuSolver {
 				}
 			}
 
+			// TODO: is this necessary?
 			cell.setValue(null);
 
 			return null;
