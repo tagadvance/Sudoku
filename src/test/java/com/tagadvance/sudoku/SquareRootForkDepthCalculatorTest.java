@@ -13,7 +13,7 @@ import com.tagadvance.sudoku.ForkJoinSudokuSolver.SquareRootForkDepthCalculator;
 public class SquareRootForkDepthCalculatorTest {
 
 	@Test
-	public void calculate9x9GridForkDepthis3() {
+	public void calculate9x9GridForkDepthIs3() {
 		SquareRootForkDepthCalculator calculator = new SquareRootForkDepthCalculator();
 		@SuppressWarnings("unchecked")
 		Grid<Void> grid = mock(Grid.class);
