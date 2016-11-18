@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.testing.NullPointerTester;
 import com.tagadvance.geometry.Dimension;
 import com.tagadvance.geometry.ImmutableDimension;
-import com.tagadvance.sudoku.ForkJoinSudokuSolver.CubicRootForkDepthCalculator;
+import com.tagadvance.sudoku.ForkJoinSudokuSolver.SquareRootForkDepthCalculator;
 import com.tagadvance.sudoku.ForkJoinSudokuSolver.ForkDepthCalculator;
 
 
@@ -63,7 +63,7 @@ public class SudokuSolverTest {
 		}
 
 		List<Object[]> list = new ArrayList<>();
-		ForkDepthCalculator calculator = new CubicRootForkDepthCalculator();
+		ForkDepthCalculator calculator = new SquareRootForkDepthCalculator();
 		SudokuSolver[] solvers = {new SimpleSudokuSolver(), new ForkJoinSudokuSolver(calculator)};
 		for (SudokuSolver solver : solvers) {
 			for (Grid<Integer> betaGrid : gridList) {

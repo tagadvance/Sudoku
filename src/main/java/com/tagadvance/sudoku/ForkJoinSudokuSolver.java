@@ -21,8 +21,6 @@ import com.tagadvance.geometry.Point;
 
 public class ForkJoinSudokuSolver implements SudokuSolver {
 
-	private static final int MINIMUM_FORK_DEPTH = 1;
-
 	private final ForkDepthCalculator calculator;
 
 	public ForkJoinSudokuSolver(ForkDepthCalculator calculator) {
@@ -58,14 +56,16 @@ public class ForkJoinSudokuSolver implements SudokuSolver {
 
 	}
 
-	public static class CubicRootForkDepthCalculator implements ForkDepthCalculator {
+	public static class SquareRootForkDepthCalculator implements ForkDepthCalculator {
+
+		private static final int MINIMUM_FORK_DEPTH = 1;
 
 		@Override
 		public <V> int calculateForkDepth(Grid<V> grid) {
 			ImmutableDimension size = grid.getSize();
 			int width = size.getWidth(), height = size.getHeight();
-			int area = width * height;
-			double cubicRoot = Math.cbrt(area);
+			int max = Math.max(width, height);
+			double cubicRoot = Math.sqrt(max);
 			int floor = (int) Math.floor(cubicRoot);
 			return Math.max(MINIMUM_FORK_DEPTH, floor);
 		}
