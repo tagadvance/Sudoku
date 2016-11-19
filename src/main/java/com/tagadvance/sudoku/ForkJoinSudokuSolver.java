@@ -38,16 +38,11 @@ public class ForkJoinSudokuSolver implements SudokuSolver {
 		// TODO: defensive copy of grid
 
 		AtomicSolution<V> solution = new AtomicSolution<>();
-		solution.start();
 		int depth = 0;
-		try {
-			SudokuSolverRecursiveTask<V> solver = new SudokuSolverRecursiveTask<>(sudoku, grid,
-					solution, depth, new AtomicBoolean());
-			pool.invoke(solver);
-			return solution;
-		} finally {
-			solution.stop();
-		}
+		SudokuSolverRecursiveTask<V> solver = new SudokuSolverRecursiveTask<>(sudoku, grid,
+				solution, depth, new AtomicBoolean());
+		pool.invoke(solver);
+		return solution;
 	}
 
 	public static interface ForkDepthCalculator {
@@ -102,12 +97,14 @@ public class ForkJoinSudokuSolver implements SudokuSolver {
 			if (sudoku.isValid(grid)) {
 				Grid<V> result = solve(grid, depth);
 				if (result != null) {
-					solution.setSolution(result);
+					UnsolvableException e = null;
+					solution.setSolution(result, e);
 					interrupt.set(true);
 				}
 			} else {
+				Grid<V> result = null;
 				UnsolvableException e = new UnsolvableException("sudoku is not in a valid state");
-				solution.setException(e);
+				solution.setSolution(result, e);
 			}
 			joinAll();
 

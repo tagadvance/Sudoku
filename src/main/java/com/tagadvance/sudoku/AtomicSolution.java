@@ -2,62 +2,47 @@ package com.tagadvance.sudoku;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.google.common.base.MoreObjects;
+
 public class AtomicSolution<V> implements Solution<V> {
 
 	AtomicInteger iterations;
-	long start;
-	long stop;
 
 	private Grid<V> grid;
-	private UnsolvableException e;
+	private UnsolvableException exception = new UnsolvableException();
 
 	public AtomicSolution() {
 		super();
 		this.iterations = new AtomicInteger();
 	}
 
-	public void start() {
-		this.start = System.currentTimeMillis();
-	}
-
-	public void stop() {
-		this.stop = System.currentTimeMillis();
-	}
-
 	@Override
 	public Grid<V> getSolution() throws UnsolvableException {
 		if (grid == null) {
-			if (e == null) {
-				e = new UnsolvableException();
-			}
-			throw e;
+			throw exception;
 		}
-		return this.grid;
+		return grid;
 	}
 
-	protected void setSolution(Grid<V> grid) {
+	/**
+	 * Only one argument may be <code>null</code>. If both arguments are not <code>null</code> then
+	 * the {@link UnsolvableException} takes precedence.
+	 * 
+	 * @param grid The solved puzzle grid.
+	 * @param e An {@link UnsolvableException}.
+	 */
+	protected void setSolution(Grid<V> grid, UnsolvableException e) {
+		if (grid == null && e == null) {
+			throw new IllegalArgumentException("only one argument may be null");
+		}
 		this.grid = grid;
-	}
-
-	protected void setException(UnsolvableException e) {
-		this.e = e;
+		this.exception = e;
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("iterations = " + iterations);
-		if (start < stop) {
-			String lineSeparator = System.getProperty("line.separator");
-			sb.append(lineSeparator);
-			double seconds = calculateElapsedSeconds();
-			sb.append(seconds + " seconds");
-		}
-		return sb.toString();
-	}
-
-	private double calculateElapsedSeconds() {
-		return (stop - start) / 1000d;
+		return MoreObjects.toStringHelper(AtomicSolution.class).add("grid", grid)
+				.add("exception", exception).toString();
 	}
 
 }

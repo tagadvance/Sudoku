@@ -15,19 +15,35 @@ public class AtomicSolutionTest {
 
 	@Test()
 	public void testGetSolutionReturnsGrid() throws UnsolvableException {
+		AtomicSolution<Void> solution = new AtomicSolution<>();
 		@SuppressWarnings("unchecked")
 		Grid<Void> expectedGrid = mock(Grid.class);
-		AtomicSolution<Void> solution = new AtomicSolution<>();
-		solution.setSolution(expectedGrid);
+		UnsolvableException exception = null;
+		solution.setSolution(expectedGrid, exception);
 		Grid<Void> grid = solution.getSolution();
 		Assert.assertNotNull(grid);
 	}
 
 	@Test()
 	public void testGetSolutionThrowsCustomUnsolvableException() {
-		UnsolvableException expectedException = new UnsolvableException("foobar");
 		AtomicSolution<Void> solution = new AtomicSolution<>();
-		solution.setException(expectedException);
+		Grid<Void> grid = null;
+		UnsolvableException expectedException = new UnsolvableException("foobar");
+		solution.setSolution(grid, expectedException);
+		try {
+			solution.getSolution();
+		} catch (UnsolvableException e) {
+			Assert.assertEquals(expectedException, e);
+		}
+	}
+
+	@Test()
+	public void testGetSolutionUnsolvableExceptionTakesPrecedenceOverGrid() {
+		AtomicSolution<Void> solution = new AtomicSolution<>();
+		@SuppressWarnings("unchecked")
+		Grid<Void> grid = mock(Grid.class);
+		UnsolvableException expectedException = new UnsolvableException("foobar");
+		solution.setSolution(grid, expectedException);
 		try {
 			solution.getSolution();
 		} catch (UnsolvableException e) {
