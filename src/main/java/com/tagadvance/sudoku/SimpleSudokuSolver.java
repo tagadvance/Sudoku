@@ -57,15 +57,16 @@ public class SimpleSudokuSolver implements SudokuSolver {
 		}
 
 		private Grid<V> solve(Grid<V> grid) {
-			if (sudoku.isSolved(grid)) {
-				return grid;
-			}
-			
 			if (!sudoku.isValid(grid)) {
 				return null;
 			}
+			
+			if (sudoku.isSolved(grid)) {
+				return grid;
+			}
 
-			List<ImmutablePoint> cells = getPrioritizedCellList(grid);
+			List<ImmutablePoint> cells = getEmptyCells(grid);
+			prioritize(grid, cells);
 			if (cells.isEmpty()) {
 				return null;
 			}
@@ -86,12 +87,6 @@ public class SimpleSudokuSolver implements SudokuSolver {
 			cell.setValue(null);
 
 			return null;
-		}
-
-		private List<ImmutablePoint> getPrioritizedCellList(Grid<V> grid) {
-			List<ImmutablePoint> emptyCells = getEmptyCells(grid);
-			prioritize(grid, emptyCells);
-			return emptyCells;
 		}
 
 		private List<ImmutablePoint> getEmptyCells(Grid<V> grid) {

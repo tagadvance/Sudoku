@@ -111,12 +111,12 @@ public class ForkJoinSudokuSolver implements SudokuSolver {
 				return null;
 			}
 
-			if (sudoku.isSolved(grid)) {
-				return grid;
-			}
-
 			if (!sudoku.isValid(grid)) {
 				return null;
+			}
+			
+			if (sudoku.isSolved(grid)) {
+				return grid;
 			}
 
 			List<ImmutablePoint> cells = getPrioritizedCellList(grid);
