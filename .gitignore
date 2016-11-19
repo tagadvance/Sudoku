@@ -71,3 +71,10 @@ gradle-app.setting
 
 # # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
 # gradle/wrapper/gradle-wrapper.properties
+
+##
+## Custom
+##
+
+# Prototypes and other, often incomplete, snippets of code that I do not want published.
+scratch/
