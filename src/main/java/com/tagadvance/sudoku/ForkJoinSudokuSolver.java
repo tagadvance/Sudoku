@@ -94,17 +94,11 @@ public class ForkJoinSudokuSolver implements SudokuSolver {
 
 		@Override
 		protected Void compute() {
-			if (sudoku.isValid(grid)) {
-				Grid<V> result = solve(grid, depth);
-				if (result != null) {
-					UnsolvableException e = null;
-					solution.setSolution(result, e);
-					interrupt.set(true);
-				}
-			} else {
-				Grid<V> result = null;
-				UnsolvableException e = new UnsolvableException("sudoku is not in a valid state");
+			Grid<V> result = solve(grid, depth);
+			if (result != null) {
+				UnsolvableException e = null;
 				solution.setSolution(result, e);
+				interrupt.set(true);
 			}
 			joinAll();
 

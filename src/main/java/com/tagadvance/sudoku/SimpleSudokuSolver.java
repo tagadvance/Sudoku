@@ -47,13 +47,6 @@ public class SimpleSudokuSolver implements SudokuSolver {
 		}
 
 		public Solution<V> solve() {
-			if (!sudoku.isValid(alphaGrid)) {
-				Grid<V> grid = null;
-				UnsolvableException e = new UnsolvableException("sudoku is not in a valid state");
-				solution.setSolution(grid, e);
-				return solution;
-			}
-
 			Grid<V> grid = solve(alphaGrid);
 			if (grid != null) {
 				UnsolvableException e = null;
