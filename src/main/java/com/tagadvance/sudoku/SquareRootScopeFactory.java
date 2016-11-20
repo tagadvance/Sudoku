@@ -2,6 +2,7 @@ package com.tagadvance.sudoku;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +30,8 @@ public class SquareRootScopeFactory implements ScopeFactory {
 		if (blockSize > 0) {
 			for (int y = 0, v = 0; v < blockSize; y += blockSize, v++) {
 				for (int x = 0, h = 0; h < blockSize; x += blockSize, h++) {
-					RectangleScope<V> scope = new RectangleScope<>(x, y, blockSize, blockSize);
+					Rectangle rectangle = new Rectangle(x, y, blockSize, blockSize);
+					RectangleScope<V> scope = new RectangleScope<>(rectangle);
 					scopes.add(scope);
 				}
 			}
@@ -39,7 +41,8 @@ public class SquareRootScopeFactory implements ScopeFactory {
 		int x = 0, y = 0;
 		int regionWidth = 1;
 		for (x = 0; x < width; x++) {
-			RectangleScope<V> scope = new RectangleScope<>(x, y, regionWidth, height);
+			Rectangle rectangle = new Rectangle(x, y, regionWidth, height);
+			RectangleScope<V> scope = new RectangleScope<>(rectangle);
 			scopes.add(scope);
 		}
 
@@ -48,7 +51,8 @@ public class SquareRootScopeFactory implements ScopeFactory {
 		y = 0;
 		int regionHeight = 1;
 		for (y = 0; y < height; y++) {
-			RectangleScope<V> scope = new RectangleScope<>(x, y, width, regionHeight);
+			Rectangle rectangle = new Rectangle(x, y, width, regionHeight);
+			RectangleScope<V> scope = new RectangleScope<>(rectangle);
 			scopes.add(scope);
 		}
 

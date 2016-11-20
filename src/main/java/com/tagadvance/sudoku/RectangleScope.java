@@ -1,9 +1,12 @@
 package com.tagadvance.sudoku;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -16,10 +19,9 @@ import com.google.common.collect.ImmutableSet;
 import com.tagadvance.geometry.ImmutablePoint;
 import com.tagadvance.geometry.Point;
 
-@SuppressWarnings("serial")
-// TODO: do not extend Rectangle as it is mutable
-class RectangleScope<V> extends Rectangle implements Scope<V> {
+class RectangleScope<V> implements Scope<V> {
 
+	private final Rectangle rectangle;
 	private final ImmutableSet<ImmutablePoint> pointSet;
 
 	/**
@@ -28,12 +30,16 @@ class RectangleScope<V> extends Rectangle implements Scope<V> {
 	private final LoadingCache<Grid<V>, ImmutableCollection<Cell<V>>> cellCache =
 			CacheBuilder.newBuilder().build(new CellCacheLoader());
 
-	public RectangleScope(int x, int y, int width, int height) {
-		super(x, y, width, height);
+	public RectangleScope(Rectangle rectangle) {
+		super();
+
+		// beautiful error message
+		checkNotNull(rectangle, "rectangle must not be null");
+		this.rectangle = new Rectangle(rectangle);
 
 		List<ImmutablePoint> pointList = new ArrayList<>();
-		for (int y2 = y; y2 < y + height; y2++) {
-			for (int x2 = x; x2 < x + width; x2++) {
+		for (int y2 = rectangle.y; y2 < rectangle.y + rectangle.height; y2++) {
+			for (int x2 = rectangle.x; x2 < rectangle.x + rectangle.width; x2++) {
 				ImmutablePoint point = new Point(x2, y2);
 				pointList.add(point);
 			}
@@ -92,8 +98,28 @@ class RectangleScope<V> extends Rectangle implements Scope<V> {
 	}
 
 	@Override
+	public int hashCode() {
+		return Objects.hash(rectangle, pointSet);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		} else if (obj == null) {
+			return false;
+		} else if (getClass() != obj.getClass()) {
+			return false;
+		}
+		@SuppressWarnings("rawtypes")
+		RectangleScope other = (RectangleScope) obj;
+		return Objects.equals(rectangle, other.rectangle)
+				&& Objects.equals(pointSet, other.pointSet);
+	}
+
+	@Override
 	public String toString() {
-		return getBounds().toString();
+		return rectangle.toString();
 	}
 
 	private class CellCacheLoader extends CacheLoader<Grid<V>, ImmutableCollection<Cell<V>>> {
