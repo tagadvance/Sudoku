@@ -4,7 +4,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,13 +90,8 @@ public class SimpleSudokuSolver implements SudokuSolver {
 				cells.put(cell, size);
 			}
 			// sort from least to greatest
-			Collections.sort(emptyCells, new Comparator<Cell<V>>() {
-				@Override
-				public int compare(Cell<V> c1, Cell<V> c2) {
-					int size1 = cells.get(c1);
-					int size2 = cells.get(c2);
-					return (size1 == size2 ? 0 : (size1 < size2 ? -1 : 1));
-				}
+			Collections.sort(emptyCells, (cell1, cell2) -> {
+				return cells.get(cell1).compareTo(cells.get(cell2));
 			});
 			return cells;
 		}
