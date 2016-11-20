@@ -5,15 +5,28 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.tagadvance.geometry.ImmutablePoint;
 import com.tagadvance.geometry.Point;
 
 @SuppressWarnings("serial")
+// TODO: do not extend Rectangle as it is mutable
 class RectangleScope<V> extends Rectangle implements Scope<V> {
 
 	private final ImmutableSet<ImmutablePoint> pointSet;
+
+	/**
+	 * cache of scopes for cell
+	 */
+	private final LoadingCache<Grid<V>, ImmutableCollection<Cell<V>>> cellCache =
+			CacheBuilder.newBuilder().build(new CellCacheLoader());
 
 	public RectangleScope(int x, int y, int width, int height) {
 		super(x, y, width, height);
@@ -28,17 +41,19 @@ class RectangleScope<V> extends Rectangle implements Scope<V> {
 		this.pointSet = ImmutableSet.copyOf(pointList);
 	}
 
-	// TODO: see if this is ever called
 	@Override
-	public ImmutableSet<ImmutablePoint> getCellPoints() {
-		return this.pointSet;
+	public ImmutableCollection<Cell<V>> getCells(Grid<V> grid) {
+		try {
+			return cellCache.get(grid);
+		} catch (ExecutionException e) {
+			throw new IllegalArgumentException(e);
+		}
 	}
 
 	@Override
-	public Set<V> getUsedValues(Grid<V> grid) {
-		Set<V> set = new HashSet<>();
-		for (ImmutablePoint point : pointSet) {
-			Cell<V> cell = grid.getCellAt(point);
+	public List<V> getUsedValues(Grid<V> grid) {
+		List<V> set = new ArrayList<>();
+		for (Cell<V> cell : getCells(grid)) {
 			if (!cell.isEmpty()) {
 				V value = cell.getValue();
 				set.add(value);
@@ -50,8 +65,7 @@ class RectangleScope<V> extends Rectangle implements Scope<V> {
 	@Override
 	public boolean isValid(Grid<V> grid) {
 		Set<V> set = new HashSet<>();
-		for (ImmutablePoint point : pointSet) {
-			Cell<V> cell = grid.getCellAt(point);
+		for (Cell<V> cell : getCells(grid)) {
 			if (cell.isEmpty()) {
 				continue;
 			}
@@ -68,8 +82,7 @@ class RectangleScope<V> extends Rectangle implements Scope<V> {
 	@Override
 	public boolean isSolved(Grid<V> grid) {
 		Set<V> set = new HashSet<>();
-		for (ImmutablePoint point : pointSet) {
-			Cell<V> cell = grid.getCellAt(point);
+		for (Cell<V> cell : getCells(grid)) {
 			V value = cell.getValue();
 			if (cell.isEmpty() || !set.add(value)) {
 				return false;
@@ -81,6 +94,20 @@ class RectangleScope<V> extends Rectangle implements Scope<V> {
 	@Override
 	public String toString() {
 		return getBounds().toString();
+	}
+
+	private class CellCacheLoader extends CacheLoader<Grid<V>, ImmutableCollection<Cell<V>>> {
+
+		@Override
+		public ImmutableCollection<Cell<V>> load(Grid<V> grid) throws Exception {
+			List<Cell<V>> cellList = new ArrayList<>();
+			for (ImmutablePoint point : pointSet) {
+				Cell<V> cell = grid.getCellAt(point);
+				cellList.add(cell);
+			}
+			return ImmutableList.copyOf(cellList);
+		}
+
 	}
 
 }

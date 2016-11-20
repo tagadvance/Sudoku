@@ -1,15 +1,12 @@
 package com.tagadvance.sudoku;
 
-import java.util.Set;
-
-import com.google.common.collect.ImmutableSet;
-import com.tagadvance.geometry.ImmutablePoint;
+import java.util.Collection;
 
 public interface Scope<V> {
 
-	ImmutableSet<ImmutablePoint> getCellPoints();
+	Collection<Cell<V>> getCells(Grid<V> grid);
 
-	Set<V> getUsedValues(Grid<V> grid);
+	Collection<V> getUsedValues(Grid<V> grid);
 
 	boolean isValid(Grid<V> grid);
 

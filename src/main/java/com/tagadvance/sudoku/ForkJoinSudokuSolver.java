@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,10 +13,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.google.common.collect.ImmutableSet;
 import com.tagadvance.geometry.ImmutableDimension;
-import com.tagadvance.geometry.ImmutablePoint;
-import com.tagadvance.geometry.Point;
 
 public class ForkJoinSudokuSolver implements SudokuSolver {
 
@@ -119,16 +115,17 @@ public class ForkJoinSudokuSolver implements SudokuSolver {
 				return grid;
 			}
 
-			List<ImmutablePoint> cells = getPrioritizedCellList(grid);
+			List<Cell<V>> cells = new ArrayList<>(grid.getCells());
+			cells.removeIf(cell -> !cell.isEmpty());
+			prioritize(grid, cells);
 			if (cells.isEmpty()) {
 				return null;
 			}
 
 			solution.iterations.incrementAndGet();
 
-			ImmutablePoint point = cells.remove(0);
-			Set<V> potentialCellValues = getPotentialValuesForCellAt(grid, point);
-			Cell<V> cell = grid.getCellAt(point);
+			Cell<V> cell = cells.remove(0);
+			Set<V> potentialCellValues = sudoku.getPotentialValuesForCell(grid, cell);
 			for (V value : potentialCellValues) {
 				cell.setValue(value);
 
@@ -158,67 +155,23 @@ public class ForkJoinSudokuSolver implements SudokuSolver {
 			}
 		}
 
-		private List<ImmutablePoint> getPrioritizedCellList(Grid<V> grid) {
-			List<ImmutablePoint> emptyCells = getEmptyCells(grid);
-			prioritize(grid, emptyCells);
-			return emptyCells;
-		}
-
-		private List<ImmutablePoint> getEmptyCells(Grid<V> grid) {
-			ImmutableDimension size = grid.getSize();
-			List<ImmutablePoint> list = new ArrayList<>();
-			for (int y = 0; y < size.getHeight(); y++) {
-				for (int x = 0; x < size.getWidth(); x++) {
-					ImmutablePoint point = new Point(x, y);
-					Cell<V> cell = grid.getCellAt(point);
-					if (cell.isEmpty()) {
-						list.add(point);
-					}
-				}
-			}
-			return list;
-		}
-
-		private Map<ImmutablePoint, Integer> prioritize(Grid<V> grid,
-				List<ImmutablePoint> emptyCells) {
-			final Map<ImmutablePoint, Integer> cells = new HashMap<ImmutablePoint, Integer>();
-			for (ImmutablePoint point : emptyCells) {
-				Set<V> potentialValues = getPotentialValuesForCellAt(grid, point);
+		private Map<Cell<V>, Integer> prioritize(Grid<V> grid, List<Cell<V>> emptyCells) {
+			final Map<Cell<V>, Integer> cells = new HashMap<>();
+			for (Cell<V> cell : emptyCells) {
+				Set<V> potentialValues = sudoku.getPotentialValuesForCell(grid, cell);
 				int size = potentialValues.size();
-				cells.put(point, size);
+				cells.put(cell, size);
 			}
 			// sort from least to greatest
-			Collections.sort(emptyCells, new Comparator<ImmutablePoint>() {
+			Collections.sort(emptyCells, new Comparator<Cell<V>>() {
 				@Override
-				public int compare(ImmutablePoint p1, ImmutablePoint p2) {
-					int size1 = cells.get(p1);
-					int size2 = cells.get(p2);
+				public int compare(Cell<V> c1, Cell<V> c2) {
+					int size1 = cells.get(c1);
+					int size2 = cells.get(c2);
 					return (size1 == size2 ? 0 : (size1 < size2 ? -1 : 1));
 				}
 			});
 			return cells;
-		}
-
-		/**
-		 * Iterate over each of the cell's scopes and get the unused potential values common to each
-		 * scope, i.e. weed out any values that can't possibly be correct.
-		 */
-		private Set<V> getPotentialValuesForCellAt(Grid<V> grid, ImmutablePoint point) {
-			ImmutableSet<V> values = sudoku.getValues();
-			Set<V> potentialValues = new HashSet<>(values);
-
-			// System.out.println(potentialValues);
-			// System.out.println("values: " + Joiner.on(' ').join(potentialValues));
-
-			Set<Scope<V>> scopeSet = sudoku.getScopesForPoint(point);
-			for (Scope<V> scope : scopeSet) {
-				Set<V> usedValues = scope.getUsedValues(grid);
-				// System.out.println("removing: " + Joiner.on(' ').join(usedValues));
-				potentialValues.removeAll(usedValues);
-			}
-			// System.out.println("values: " + Joiner.on(' ').join(potentialValues));
-
-			return potentialValues;
 		}
 
 	}

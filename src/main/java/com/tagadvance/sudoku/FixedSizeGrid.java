@@ -3,6 +3,11 @@ package com.tagadvance.sudoku;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableMap;
 import com.tagadvance.geometry.ImmutableDimension;
 import com.tagadvance.geometry.ImmutablePoint;
 import com.tagadvance.geometry.Point;
@@ -13,10 +18,10 @@ public class FixedSizeGrid<V> implements Grid<V> {
 
 	private final ImmutableDimension size;
 	private final CellFactory<V> factory;
-	private Cell<V>[][] grid;
+	
+	private final ImmutableMap<ImmutablePoint, Cell<V>> cellMap;
 
 	// TODO: unit test preconditions
-	@SuppressWarnings("unchecked")
 	public FixedSizeGrid(ImmutableDimension size, CellFactory<V> factory) {
 		super();
 		this.size = checkNotNull(size, "size must not be null");
@@ -28,24 +33,39 @@ public class FixedSizeGrid<V> implements Grid<V> {
 		checkArgument(height >= MIN_SIZE, "height must be >= %d", MIN_SIZE);
 		checkArgument(height <= MAX_SIZE, "height must be <= %d", MAX_SIZE);
 
-		this.grid = new Cell[height][width];
+		Map<ImmutablePoint, Cell<V>> pointMap = new HashMap<>();
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				this.grid[y][x] = factory.createCell();
+				ImmutablePoint point = new Point(x, y);
+				Cell<V> cell = factory.createCell();
+				pointMap.put(point, cell);
 			}
 		}
+		this.cellMap = ImmutableMap.copyOf(pointMap);
+	}
+	
+	private FixedSizeGrid(ImmutableDimension size, CellFactory<V> factory, ImmutableMap<ImmutablePoint, Cell<V>> cellMap) {
+		super();
+		this.size = size;
+		this.factory = factory;
+		
+		Map<ImmutablePoint, Cell<V>> temporaryCellMap = new HashMap<>();
+		for (Map.Entry<ImmutablePoint, Cell<V>> entry : cellMap.entrySet()) {
+			ImmutablePoint point = entry.getKey();
+			Cell<V> cell = entry.getValue();
+			V value = cell.getValue();
+			
+			Cell<V> newCell = factory.createCell();
+			newCell.setValue(value);
+			
+			temporaryCellMap.put(point, newCell);
+		}
+		this.cellMap = ImmutableMap.copyOf(temporaryCellMap);
 	}
 
 	@Override
 	public FixedSizeGrid<V> copy() {
-		FixedSizeGrid<V> grid = new FixedSizeGrid<>(size, factory);
-		for (int y = 0; y < this.grid.length; y++) {
-			for (int x = 0; x < this.grid[y].length; x++) {
-				V value = this.grid[y][x].getValue();
-				grid.grid[y][x].setValue(value);
-			}
-		}
-		return grid;
+		return new FixedSizeGrid<>(size, factory, cellMap);
 	}
 
 	@Override
@@ -54,16 +74,21 @@ public class FixedSizeGrid<V> implements Grid<V> {
 	}
 
 	@Override
+	public ImmutableCollection<Cell<V>> getCells() {
+		return cellMap.values();
+	}
+
+	@Override
 	public Cell<V> getCellAt(ImmutablePoint point) {
-		return this.grid[point.getY()][point.getX()];
+		return cellMap.get(point);
 	}
 
 	// TODO: unit test
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		for (int y = 0; y < grid.length; y++) {
-			for (int x = 0; x < grid[y].length; x++) {
+		for (int y = 0; y < size.getHeight(); y++) {
+			for (int x = 0; x < size.getWidth(); x++) {
 				ImmutablePoint point = new Point(x, y);
 				Cell<V> cell = getCellAt(point);
 				String value = cell.isEmpty() ? "?" : cell.getValue().toString();
@@ -72,7 +97,7 @@ public class FixedSizeGrid<V> implements Grid<V> {
 				}
 				sb.append(value);
 			}
-			if (y < grid.length - 1) {
+			if (y < size.getHeight() - 1) {
 				sb.append("\n");
 			}
 		}

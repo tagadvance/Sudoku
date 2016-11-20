@@ -1,7 +1,8 @@
 package com.tagadvance.sudoku;
 
+import java.util.Set;
+
 import com.google.common.collect.ImmutableSet;
-import com.tagadvance.geometry.ImmutablePoint;
 
 public interface Sudoku<V> extends Copyable<Sudoku<V>> {
 
@@ -9,7 +10,7 @@ public interface Sudoku<V> extends Copyable<Sudoku<V>> {
 
 	ImmutableSet<Scope<V>> getScopes();
 
-	ImmutableSet<Scope<V>> getScopesForPoint(ImmutablePoint point);
+	Set<V> getPotentialValuesForCell(Grid<V> grid, Cell<V> cell);
 
 	boolean isValid(Grid<V> grid);
 
