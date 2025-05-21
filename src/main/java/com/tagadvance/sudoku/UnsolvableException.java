@@ -1,21 +1,20 @@
 package com.tagadvance.sudoku;
 
-@SuppressWarnings("serial")
-class UnsolvableException extends Exception {
+public class UnsolvableException extends Exception {
 
-	UnsolvableException() {
+	public UnsolvableException() {
 		super();
 	}
 
-	UnsolvableException(String message, Throwable cause) {
+	public UnsolvableException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	UnsolvableException(String message) {
+	public UnsolvableException(String message) {
 		super(message);
 	}
 
-	UnsolvableException(Throwable cause) {
+	public UnsolvableException(Throwable cause) {
 		super(cause);
 	}
 

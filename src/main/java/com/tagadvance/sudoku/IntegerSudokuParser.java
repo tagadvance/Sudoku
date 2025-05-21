@@ -1,31 +1,34 @@
 package com.tagadvance.sudoku;
 
-import com.tagadvance.geometry.ImmutableDimension;
-import com.tagadvance.geometry.ImmutablePoint;
 import com.tagadvance.geometry.Point;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
 
 public class IntegerSudokuParser implements SudokuParser<Integer> {
 
 	@Override
-	public void populateSudokuFromString(Grid<Integer> grid, String puzzle) {
-		ImmutableDimension size = grid.getSize();
+	public void populateSudokuFromString(final Grid<Integer> grid, final String puzzle) {
+		final var size = grid.getSize();
 
-		int x = 0, y = 0;
-		for (int i = 0; i < puzzle.length(); i++) {
-			ImmutablePoint point = new Point(x, y);
-			Cell<Integer> cell = grid.getCellAt(point);
-			String value = puzzle.substring(i, i + 1);
-			try {
-				Integer integer = Integer.parseInt(value);
-				cell.setValue(integer);
-			} catch (NumberFormatException e) {
-				// e.printStackTrace();
+		final var x = new AtomicInteger();
+		final var y = new AtomicInteger();
+		IntStream.range(0, puzzle.length()).map(puzzle::charAt).forEach(c -> {
+			final var point = new Point(x.get(), y.get());
+			final var cell = grid.getCellAt(point);
+			if (c >= '0' && c <= '9') {
+				cell.setValue(c - '0');
 			}
-			if (++x >= size.getWidth()) {
-				y++;
-				x = 0;
-			}
-		}
+
+			x.getAndUpdate(i -> {
+				if (++i >= size.width()) {
+					y.getAndIncrement();
+
+					return 0;
+				}
+
+				return i;
+			});
+		});
 	}
 
 }

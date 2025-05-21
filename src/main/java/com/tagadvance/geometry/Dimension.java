@@ -1,58 +1,36 @@
 package com.tagadvance.geometry;
 
 import com.google.common.base.MoreObjects;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
-public class Dimension implements ImmutableDimension {
+public record Dimension(int width, int height) {
 
-	private final int width, height;
-
-	public Dimension(int width, int height) {
-		super();
-		this.width = width;
-		this.height = height;
+	public Stream<Point> stream() {
+		return IntStream.range(0, height)
+			.mapToObj(y -> IntStream.range(0, width).mapToObj(x -> new Point(x, y)))
+			.flatMap(Function.identity());
 	}
 
 	@Override
-	public int getWidth() {
-		return this.width;
-	}
-
-	@Override
-	public int getHeight() {
-		return this.height;
+	public boolean equals(final Object o) {
+		return o instanceof final Dimension dimension && width == dimension.width
+			&& height == dimension.height;
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + width;
-		result = prime * result + height;
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		} else if (obj == null) {
-			return false;
-		} else if (getClass() != obj.getClass()) {
-			return false;
-		}
-		Dimension other = (Dimension) obj;
-		if (width != other.width) {
-			return false;
-		} else if (height != other.height) {
-			return false;
-		}
-		return true;
+		return Objects.hash(width, height);
 	}
 
 	@Override
 	public String toString() {
-		return MoreObjects.toStringHelper(Dimension.class).add("width", width).add("height", height)
-				.toString();
+		return MoreObjects.toStringHelper(Dimension.class)
+			.add("width", width)
+			.add("height", height)
+			.toString();
 	}
 
 }

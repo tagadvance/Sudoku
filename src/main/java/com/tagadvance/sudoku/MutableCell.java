@@ -1,11 +1,15 @@
 package com.tagadvance.sudoku;
 
-public class EmptyCell<V> implements Cell<V> {
+class MutableCell<V> implements Cell<V> {
 
 	private V value;
 
-	public EmptyCell() {
+	MutableCell() {
 		super();
+	}
+
+	MutableCell(final V value) {
+		this.value = value;
 	}
 
 	@Override

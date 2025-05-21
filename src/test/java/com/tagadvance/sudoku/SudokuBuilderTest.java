@@ -1,41 +1,43 @@
 package com.tagadvance.sudoku;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import com.tagadvance.sudoku.SudokuBuilder.SudokuFactory;
+import org.junit.jupiter.api.Test;
 
-public class SudokuBuilderTest {
+class SudokuBuilderTest {
 
 	@Test
-	public void newBuilderReturnsNewInstance() throws NoSuchMethodException, SecurityException {
-		SudokuBuilder builder = SudokuBuilder.newBuilder();
-		Assert.assertNotNull(builder);
+	void newBuilderReturnsNewInstance() throws SecurityException {
+		final var builder = SudokuBuilder.newBuilder();
+
+		assertNotNull(builder);
 	}
 
 	@Test
-	public void createClassicSudokuFactoryReturnsNewInstance()
-			throws NoSuchMethodException, SecurityException {
-		SudokuBuilder builder = SudokuBuilder.newBuilder();
-		SudokuFactory<Integer> factory = builder.createClassicSudokuFactory();
-		Assert.assertNotNull(factory);
+	void createClassicSudokuFactoryReturnsNewInstance() throws SecurityException {
+		final var builder = SudokuBuilder.newBuilder();
+		final var factory = builder.createClassicSudokuFactory();
+
+		assertNotNull(factory);
 	}
 
 	@Test
-	public void createEmptyGridReturnsNewInstance()
-			throws NoSuchMethodException, SecurityException {
-		SudokuBuilder builder = SudokuBuilder.newBuilder();
-		SudokuFactory<Integer> factory = builder.createClassicSudokuFactory();
-		Grid<Integer> grid = factory.createEmptyGrid();
-		Assert.assertNotNull(grid);
+	void createEmptyGridReturnsNewInstance()
+		throws SecurityException {
+		final var builder = SudokuBuilder.newBuilder();
+		final var factory = builder.createClassicSudokuFactory();
+		final var grid = factory.createEmptyGrid();
+
+		assertNotNull(grid);
 	}
 
 	@Test
-	public void createSudokuReturnsNewInstance() throws NoSuchMethodException, SecurityException {
-		SudokuBuilder builder = SudokuBuilder.newBuilder();
-		SudokuFactory<Integer> factory = builder.createClassicSudokuFactory();
-		Sudoku<Integer> sudoku = factory.createSudoku();
-		Assert.assertNotNull(sudoku);
+	void createSudokuReturnsNewInstance() throws SecurityException {
+		final var builder = SudokuBuilder.newBuilder();
+		final var factory = builder.createClassicSudokuFactory();
+		final var sudoku = factory.createSudoku();
+
+		assertNotNull(sudoku);
 	}
 
 }

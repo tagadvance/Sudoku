@@ -1,8 +1,7 @@
 package com.tagadvance.sudoku;
 
-import java.util.Set;
-
 import com.google.common.collect.ImmutableSet;
+import java.util.Set;
 
 public interface Sudoku<V> extends Copyable<Sudoku<V>> {
 
@@ -12,8 +11,12 @@ public interface Sudoku<V> extends Copyable<Sudoku<V>> {
 
 	Set<V> getPotentialValuesForCell(Grid<V> grid, Cell<V> cell);
 
-	boolean isValid(Grid<V> grid);
+	default boolean isValid(final Grid<V> grid) {
+		return getScopes().stream().allMatch(scope -> scope.isValid(grid));
+	}
 
-	boolean isSolved(Grid<V> grid);
+	default boolean isSolved(Grid<V> grid) {
+		return getScopes().stream().allMatch(scope -> scope.isSolved(grid));
+	}
 
 }

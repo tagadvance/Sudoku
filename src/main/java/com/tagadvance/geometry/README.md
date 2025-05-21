@@ -1,1 +1,0 @@
-Based on the [java.awt.Point](https://docs.oracle.com/javase/8/docs/api/java/awt/Point.html) and [java.awt.Dimension](https://docs.oracle.com/javase/8/doecs/api/java/awt/Dimension.html) classes.

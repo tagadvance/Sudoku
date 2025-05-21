@@ -1,61 +1,54 @@
 package com.tagadvance.sudoku;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class AtomicSolutionTest {
+@SuppressWarnings("unchecked")
+class AtomicSolutionTest {
 
-	@Test(expected = UnsolvableException.class)
-	public void testGetSolutionThrowsUnsolvableException() throws UnsolvableException {
-		AtomicSolution<Void> solution = new AtomicSolution<>();
-		solution.getSolution();
+	@Test
+	void testGetSolutionThrowsUnsolvableException() {
+		assertThrows(UnsolvableException.class, () -> new AtomicSolution<>().getSolution());
 	}
 
-	@Test()
-	public void testGetSolutionReturnsGrid() throws UnsolvableException {
-		AtomicSolution<Void> solution = new AtomicSolution<>();
-		@SuppressWarnings("unchecked")
-		Grid<Void> expectedGrid = mock(Grid.class);
-		UnsolvableException exception = null;
-		solution.setSolution(expectedGrid, exception);
-		Grid<Void> grid = solution.getSolution();
-		Assert.assertNotNull(grid);
+	@Test
+	void testGetSolutionReturnsGrid() throws UnsolvableException {
+		final var solution = new AtomicSolution<Void>();
+		final var expectedGrid = (Grid<Void>) mock(Grid.class);
+		solution.setSolution(expectedGrid, null);
+		final var grid = solution.getSolution();
+
+		assertNotNull(grid);
 	}
 
-	@Test()
-	public void testGetSolutionThrowsCustomUnsolvableException() {
-		AtomicSolution<Void> solution = new AtomicSolution<>();
-		Grid<Void> grid = null;
-		UnsolvableException expectedException = new UnsolvableException("foobar");
+	@Test
+	void testGetSolutionThrowsCustomUnsolvableException() {
+		final var solution = new AtomicSolution<Void>();
+		final var expectedException = new UnsolvableException("foobar");
+		solution.setSolution(null, expectedException);
+
+		assertThrows(UnsolvableException.class, solution::getSolution, "foobar");
+	}
+
+	@Test
+	void testGetSolutionUnsolvableExceptionTakesPrecedenceOverGrid() {
+		final var solution = new AtomicSolution<Void>();
+		final var grid = (Grid<Void>) mock(Grid.class);
+		final var expectedException = new UnsolvableException("foobar");
 		solution.setSolution(grid, expectedException);
-		try {
-			solution.getSolution();
-		} catch (UnsolvableException e) {
-			Assert.assertEquals(expectedException, e);
-		}
+
+		assertThrows(UnsolvableException.class, solution::getSolution, "foobar");
 	}
 
-	@Test()
-	public void testGetSolutionUnsolvableExceptionTakesPrecedenceOverGrid() {
-		AtomicSolution<Void> solution = new AtomicSolution<>();
-		@SuppressWarnings("unchecked")
-		Grid<Void> grid = mock(Grid.class);
-		UnsolvableException expectedException = new UnsolvableException("foobar");
-		solution.setSolution(grid, expectedException);
-		try {
-			solution.getSolution();
-		} catch (UnsolvableException e) {
-			Assert.assertEquals(expectedException, e);
-		}
-	}
+	@Test
+	void testToStringIsNotNull() {
+		final var solution = new AtomicSolution<Void>();
+		final var string = solution.toString();
 
-	@Test()
-	public void testToStringIsNotNull() {
-		AtomicSolution<Void> solution = new AtomicSolution<>();
-		String s = solution.toString();
-		Assert.assertNotNull(s);
+		assertNotNull(string);
 	}
 
 }

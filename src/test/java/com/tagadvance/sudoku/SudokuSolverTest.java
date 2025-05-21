@@ -1,100 +1,81 @@
 package com.tagadvance.sudoku;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import static java.util.function.Predicate.not;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.io.CharStreams;
 import com.google.common.testing.NullPointerTester;
 import com.tagadvance.geometry.Dimension;
-import com.tagadvance.geometry.ImmutableDimension;
 import com.tagadvance.sudoku.ForkJoinSudokuSolver.SquareRootForkDepthCalculator;
-import com.tagadvance.sudoku.ForkJoinSudokuSolver.ForkDepthCalculator;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.Method;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
+class SudokuSolverTest {
 
-@RunWith(value = Parameterized.class)
-public class SudokuSolverTest {
+	static Stream<Object[]> createParameters() throws IOException {
+		final var values = IntStream.rangeClosed(1, 9)
+			.boxed()
+			.collect(ImmutableSet.toImmutableSet());
 
-	@Parameters
-	public static Iterable<Object[]> createParameters() throws IOException {
-		List<Integer> range = IntStream.rangeClosed(1, 9).boxed().collect(Collectors.toList());
-		ImmutableSet<Integer> values = ImmutableSet.copyOf(range);
+		final int width = 9, height = 9;
+		final var size = new Dimension(width, height);
+		final var grid = new FixedSizeGrid<Integer>(size);
+		var puzzles = readPuzzles(grid).toList();
 
-		int width = 9, height = 9;
-		ImmutableDimension size = new Dimension(width, height);
-		CellFactory<Integer> cellFactory = new EmptyCellFactory<>();
+		final var scopeFactory = new SquareRootScopeFactory();
+		final var scopes = scopeFactory.createScopes(grid);
+		final var sudoku = new CompositeSudoku<>(values, scopes);
 
-		ScopeFactory scopeFactory = new SquareRootScopeFactory();
-		Grid<Integer> grid = new FixedSizeGrid<>(size, cellFactory);
-		ImmutableSet<Scope<Integer>> scopes = scopeFactory.createScopes(grid);
-		Sudoku<Integer> sudoku = new CompositeSudoku<>(values, scopes);
-
-		SudokuParser<Integer> parser = new IntegerSudokuParser();
-
-		List<Grid<Integer>> gridList = new ArrayList<>();
-		String name = "/puzzles.txt";
-		try (InputStream is = SudokuSolverTest.class.getResourceAsStream(name);
-				InputStreamReader isr = new InputStreamReader(is);
-				BufferedReader reader = new BufferedReader(isr)) {
-			String line;
-			while ((line = reader.readLine()) != null) {
-				line = line.trim();
-				if (line.isEmpty() || line.startsWith("#")) {
-					continue;
-				}
-
-				Grid<Integer> puzzleGrid = grid.copy();
-				parser.populateSudokuFromString(puzzleGrid, line);
-
-				gridList.add(puzzleGrid);
-			}
-		}
-
-		List<Object[]> list = new ArrayList<>();
-		ForkDepthCalculator calculator = new SquareRootForkDepthCalculator();
-		SudokuSolver[] solvers = {new SimpleSudokuSolver(), new ForkJoinSudokuSolver(calculator)};
-		for (SudokuSolver solver : solvers) {
-			for (Grid<Integer> betaGrid : gridList) {
-				list.add(new Object[] {solver, sudoku, betaGrid});
-			}
-		}
-		return list;
+		final var calculator = new SquareRootForkDepthCalculator();
+		return Stream.of(new SimpleSudokuSolver(), new ForkJoinSudokuSolver(calculator))
+			.flatMap(
+				solver -> puzzles.stream().map(puzzle -> new Object[]{solver, sudoku, puzzle}));
 	}
 
-	private SudokuSolver solver;
-	private Sudoku<Integer> sudoku;
-	private Grid<Integer> grid;
+	private static Stream<Grid<Integer>> readPuzzles(final Grid<Integer> grid) throws IOException {
+		final var parser = new IntegerSudokuParser();
 
-	public SudokuSolverTest(SudokuSolver solver, Sudoku<Integer> sudoku, Grid<Integer> grid) {
-		this.solver = solver;
-		this.sudoku = sudoku;
-		this.grid = grid;
+		try (final var is = SudokuSolverTest.class.getResourceAsStream("/puzzles.txt")) {
+			if (is == null) {
+				return Stream.empty();
+			}
+
+			try (final var in = new InputStreamReader(is)) {
+				return CharStreams.readLines(in)
+					.stream()
+					.map(String::trim)
+					.filter(not(line -> line.isEmpty() || line.startsWith("#")))
+					.map(line -> {
+						Grid<Integer> puzzleGrid = grid.copy();
+						parser.populateSudokuFromString(puzzleGrid, line);
+
+						return puzzleGrid;
+					});
+			}
+		}
 	}
 
-	@Test
-	public void solveThrowsNPE() throws NoSuchMethodException, SecurityException {
+	@ParameterizedTest
+	@MethodSource("createParameters")
+	void solveThrowsNPE(SudokuSolver solver) throws NoSuchMethodException, SecurityException {
 		NullPointerTester tester = new NullPointerTester();
 		Method method = SudokuSolver.class.getMethod("solve", Sudoku.class, Grid.class);
 		tester.testMethod(solver, method);
 	}
 
-	@Test
-	public void solveReturnsSolvedSudoku() throws IOException, UnsolvableException {
-		Solution<Integer> solution = solver.solve(sudoku, this.grid);
-		Grid<Integer> grid = solution.getSolution();
-		Assert.assertTrue(sudoku.isSolved(grid));
+	@ParameterizedTest
+	@MethodSource("createParameters")
+	void solveReturnsSolvedSudoku(SudokuSolver solver, Sudoku<Integer> sudoku, Grid<Integer> grid)
+		throws UnsolvableException {
+		Solution<Integer> solution = solver.solve(sudoku, grid);
+		Grid<Integer> g = solution.getSolution();
+		assertTrue(sudoku.isSolved(g));
 	}
 
 }

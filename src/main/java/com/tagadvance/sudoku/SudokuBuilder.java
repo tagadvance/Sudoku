@@ -1,23 +1,17 @@
 package com.tagadvance.sudoku;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import com.google.common.collect.ImmutableSet;
 import com.tagadvance.geometry.Dimension;
-import com.tagadvance.geometry.ImmutableDimension;
+import java.util.stream.IntStream;
 
 /**
  * Factory dependencies are hard-coded until I can refactor this into a step builder.
  */
 public class SudokuBuilder {
 
-	private final CellFactory<Integer> cellFactory;
 	private final ScopeFactory scopeFactory;
 
 	private SudokuBuilder() {
-		this.cellFactory = new EmptyCellFactory<>();
 		this.scopeFactory = new SquareRootScopeFactory();
 	}
 
@@ -26,14 +20,14 @@ public class SudokuBuilder {
 	}
 
 	public SudokuFactory<Integer> createClassicSudokuFactory() {
-		return new ClassicSudokuFactory(cellFactory, scopeFactory);
+		return new ClassicSudokuFactory(scopeFactory);
 	}
 
-	public static interface SudokuFactory<V> {
+	public interface SudokuFactory<V> {
 
-		public Grid<V> createEmptyGrid();
+		Grid<V> createEmptyGrid();
 
-		public Sudoku<V> createSudoku();
+		Sudoku<V> createSudoku();
 
 	}
 
@@ -41,32 +35,28 @@ public class SudokuBuilder {
 
 		private static final int SIZE = 9, RANGE_START = 1, RANGE_END = 9;
 
-		private static final ImmutableSet<Integer> values;
-		static {
-			List<Integer> range = IntStream.rangeClosed(RANGE_START, RANGE_END).boxed()
-					.collect(Collectors.toList());
-			values = ImmutableSet.copyOf(range);
-		}
+		private static final ImmutableSet<Integer> values = IntStream.rangeClosed(RANGE_START,
+			RANGE_END).boxed().collect(ImmutableSet.toImmutableSet());
 
-		private final CellFactory<Integer> cellFactory;
 		private final ScopeFactory scopeFactory;
 
-		public ClassicSudokuFactory(CellFactory<Integer> cellFactory, ScopeFactory scopeFactory) {
+		public ClassicSudokuFactory(final ScopeFactory scopeFactory) {
 			super();
-			this.cellFactory = cellFactory;
 			this.scopeFactory = scopeFactory;
 		}
 
 		@Override
 		public Grid<Integer> createEmptyGrid() {
-			ImmutableDimension size = new Dimension(SIZE, SIZE);
-			return new FixedSizeGrid<Integer>(size, cellFactory);
+			final var size = new Dimension(SIZE, SIZE);
+
+			return new FixedSizeGrid<>(size);
 		}
 
 		@Override
 		public Sudoku<Integer> createSudoku() {
-			Grid<Integer> grid = createEmptyGrid();
-			ImmutableSet<Scope<Integer>> scopes = scopeFactory.createScopes(grid);
+			final var grid = createEmptyGrid();
+			final var scopes = scopeFactory.createScopes(grid);
+
 			return new CompositeSudoku<>(values, scopes);
 		}
 

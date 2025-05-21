@@ -2,10 +2,10 @@ package com.tagadvance.sudoku;
 
 public interface Cell<V> {
 
-	public boolean isEmpty();
+	boolean isEmpty();
 
-	public V getValue();
+	V getValue();
 
-	public void setValue(V value);
+	void setValue(V value);
 
 }
