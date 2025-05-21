@@ -2,7 +2,6 @@ package com.tagadvance.sudoku;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -16,11 +15,11 @@ public class SimpleSudokuSolver implements SudokuSolver {
 	}
 
 	@Override
-	public <V> Solution<V> solve(final Sudoku<V> sudoku, final Grid<V> grid) {
+	public <V> Grid<V> solve(final Sudoku<V> sudoku, final Grid<V> grid) {
 		checkNotNull(sudoku, "sudoku must not be null");
 		checkNotNull(grid, "grid must not be null");
 
-		return new InternalSudokuSolver<>(sudoku, grid).solve();
+		return new InternalSudokuSolver<>(sudoku, grid.copy()).solve();
 	}
 
 	private static class InternalSudokuSolver<V> {
@@ -28,45 +27,40 @@ public class SimpleSudokuSolver implements SudokuSolver {
 		private final Sudoku<V> sudoku;
 		private final Grid<V> alphaGrid;
 
-		private final AtomicSolution<V> solution;
-
 		public InternalSudokuSolver(final Sudoku<V> sudoku, final Grid<V> grid) {
 			super();
 			this.sudoku = sudoku;
-			this.alphaGrid = grid.copy();
-
-			this.solution = new AtomicSolution<>();
+			this.alphaGrid = grid;
 		}
 
-		public Solution<V> solve() {
-			Grid<V> grid = solve(alphaGrid);
-			if (grid != null) {
-				solution.setSolution(grid, null);
+		public Grid<V> solve() {
+			if (!sudoku.isValid(alphaGrid)) {
+				// FIXME: throw exception
+				return null;
 			}
 
-			return solution;
+			final var grid = solve(alphaGrid);
+			if (grid == null) {
+				// FIXME: throw exception?
+			}
+
+			return grid;
 		}
 
 		private Grid<V> solve(final Grid<V> grid) {
-			if (!sudoku.isValid(grid)) {
-				return null;
-			}
-
-			if (sudoku.isSolved(grid)) {
-				return grid;
-			}
-
-			final var cells = new ArrayList<>(grid.getCells());
-			cells.removeIf(cell -> !cell.isEmpty());
+			final var cells = grid.getEmptyCells();
 			prioritize(grid, cells);
-			if (cells.isEmpty()) {
-				return null;
-			}
 
 			final var cell = cells.remove(0);
 			final var potentialCellValues = sudoku.getPotentialValuesForCell(grid, cell);
 			for (final V value : potentialCellValues) {
 				cell.setValue(value);
+				if (sudoku.isSolved(grid)) {
+					return grid;
+				} else if (cells.isEmpty()) {
+					return null;
+				}
+
 				final var result = solve(grid);
 				if (result != null) {
 					return result;

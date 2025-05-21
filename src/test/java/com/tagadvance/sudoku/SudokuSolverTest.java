@@ -9,7 +9,6 @@ import com.google.common.testing.NullPointerTester;
 import com.tagadvance.geometry.Dimension;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Method;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -62,18 +61,16 @@ class SudokuSolverTest {
 	@ParameterizedTest
 	@MethodSource("createParameters")
 	void solveThrowsNPE(SudokuSolver solver) throws NoSuchMethodException, SecurityException {
-		NullPointerTester tester = new NullPointerTester();
-		Method method = SudokuSolver.class.getMethod("solve", Sudoku.class, Grid.class);
+		final var tester = new NullPointerTester();
+		final var method = SudokuSolver.class.getMethod("solve", Sudoku.class, Grid.class);
 		tester.testMethod(solver, method);
 	}
 
 	@ParameterizedTest
 	@MethodSource("createParameters")
-	void solveReturnsSolvedSudoku(SudokuSolver solver, Sudoku<Integer> sudoku, Grid<Integer> grid)
-		throws UnsolvableException {
-		Solution<Integer> solution = solver.solve(sudoku, grid);
-		Grid<Integer> g = solution.getSolution();
-		assertTrue(sudoku.isSolved(g));
+	void solveReturnsSolvedSudoku(SudokuSolver solver, Sudoku<Integer> sudoku, Grid<Integer> grid) {
+		final var solution = solver.solve(sudoku, grid);
+		assertTrue(sudoku.isSolved(solution));
 	}
 
 }
