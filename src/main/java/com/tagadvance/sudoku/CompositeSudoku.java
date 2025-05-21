@@ -45,7 +45,8 @@ public class CompositeSudoku<V> implements Sudoku<V> {
 
 	@Override
 	public Sudoku<V> copy() {
-		return new CompositeSudoku<>(values, scopeSet);
+		// don't bother as this class is immutable
+		return this;
 	}
 
 	@Override

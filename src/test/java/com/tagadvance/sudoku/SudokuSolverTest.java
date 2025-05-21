@@ -7,7 +7,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.io.CharStreams;
 import com.google.common.testing.NullPointerTester;
 import com.tagadvance.geometry.Dimension;
-import com.tagadvance.sudoku.ForkJoinSudokuSolver.SquareRootForkDepthCalculator;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
@@ -32,8 +31,7 @@ class SudokuSolverTest {
 		final var scopes = scopeFactory.createScopes(grid);
 		final var sudoku = new CompositeSudoku<>(values, scopes);
 
-		final var calculator = new SquareRootForkDepthCalculator();
-		return Stream.of(new SimpleSudokuSolver(), new ForkJoinSudokuSolver(calculator))
+		return Stream.of(new SimpleSudokuSolver(), new ForkJoinSudokuSolver())
 			.flatMap(
 				solver -> puzzles.stream().map(puzzle -> new Object[]{solver, sudoku, puzzle}));
 	}

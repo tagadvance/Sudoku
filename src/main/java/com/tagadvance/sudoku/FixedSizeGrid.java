@@ -35,19 +35,20 @@ public class FixedSizeGrid<V> implements Grid<V> {
 	private FixedSizeGrid(final Dimension size, final ImmutableMap<Point, Cell<V>> cellMap) {
 		super();
 		this.size = size;
+		this.cellMap = cellMap;
+	}
 
-		this.cellMap = cellMap.entrySet()
+	@Override
+	public FixedSizeGrid<V> copy() {
+		final ImmutableMap<Point, Cell<V>> copy = cellMap.entrySet()
 			.stream()
 			.collect(ImmutableMap.toImmutableMap(Entry::getKey, e -> {
 				final var value = e.getValue().getValue();
 
 				return new MutableCell<>(value);
 			}));
-	}
 
-	@Override
-	public FixedSizeGrid<V> copy() {
-		return new FixedSizeGrid<>(size, cellMap);
+		return new FixedSizeGrid<>(size, copy);
 	}
 
 	@Override

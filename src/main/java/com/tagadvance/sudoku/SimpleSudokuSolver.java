@@ -63,8 +63,6 @@ public class SimpleSudokuSolver implements SudokuSolver {
 				return null;
 			}
 
-			solution.iterations.incrementAndGet();
-
 			final var cell = cells.remove(0);
 			final var potentialCellValues = sudoku.getPotentialValuesForCell(grid, cell);
 			for (final V value : potentialCellValues) {

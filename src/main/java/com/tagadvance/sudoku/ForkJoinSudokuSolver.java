@@ -2,23 +2,19 @@ package com.tagadvance.sudoku;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveTask;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ForkJoinSudokuSolver implements SudokuSolver {
 
-	private final ForkDepthCalculator calculator;
-
-	public ForkJoinSudokuSolver(final ForkDepthCalculator calculator) {
+	public ForkJoinSudokuSolver() {
 		super();
-		this.calculator = requireNonNull(calculator, "calculator must not be null");
 	}
 
 	@Override
@@ -26,84 +22,32 @@ public class ForkJoinSudokuSolver implements SudokuSolver {
 		requireNonNull(sudoku, "sudoku must not be null");
 		requireNonNull(grid, "grid must not be null");
 
-		final var pool = ForkJoinPool.commonPool();
-
-		// TODO: defensive copy of grid
+		final var solver = new SudokuSolverRecursiveTask<>(sudoku, grid);
+		final var result = ForkJoinPool.commonPool().invoke(solver);
 
 		final var solution = new AtomicSolution<V>();
-		final int depth = 0;
-		final var solver = new SudokuSolverRecursiveTask<>(sudoku, grid, solution, depth,
-			new AtomicBoolean());
-		pool.invoke(solver);
+		solution.setSolution(result, null);
 
 		return solution;
 	}
 
-	public interface ForkDepthCalculator {
-
-		<V> int calculateForkDepth(Grid<V> grid);
-
-	}
-
-	public static class SquareRootForkDepthCalculator implements ForkDepthCalculator {
-
-		private static final int MINIMUM_FORK_DEPTH = 1;
-
-		@Override
-		public <V> int calculateForkDepth(final Grid<V> grid) {
-			final var size = grid.getSize();
-			final int width = size.width(), height = size.height();
-			final int max = Math.max(width, height);
-			final double cubicRoot = Math.sqrt(max);
-			final int floor = (int) Math.floor(cubicRoot);
-
-			return Math.max(MINIMUM_FORK_DEPTH, floor);
-		}
-
-	}
-
-	private class SudokuSolverRecursiveTask<V> extends RecursiveTask<Void> {
-
-		private final List<RecursiveTask<Void>> tasks = new ArrayList<>();
+	private static class SudokuSolverRecursiveTask<V> extends RecursiveTask<Grid<V>> {
 
 		private final Sudoku<V> sudoku;
 		private final Grid<V> grid;
-		private final AtomicSolution<V> solution;
-		private final int depth;
-		private final AtomicBoolean interrupt;
 
-		private final int forkDepth;
-
-		public SudokuSolverRecursiveTask(final Sudoku<V> sudoku, final Grid<V> grid,
-			final AtomicSolution<V> solution, int depth, AtomicBoolean interrupt) {
+		public SudokuSolverRecursiveTask(final Sudoku<V> sudoku, final Grid<V> grid) {
 			super();
 			this.sudoku = sudoku;
 			this.grid = grid;
-			this.solution = solution;
-			this.depth = depth;
-			this.interrupt = interrupt;
-
-			this.forkDepth = calculator.calculateForkDepth(grid);
 		}
 
 		@Override
-		protected Void compute() {
-			Grid<V> result = solve(grid, depth);
-			if (result != null) {
-				solution.setSolution(result, null);
-				interrupt.set(true);
-			}
-			joinAll();
-
-			return null;
+		protected Grid<V> compute() {
+			return solve(grid);
 		}
 
-		private Grid<V> solve(final Grid<V> grid, int depth) {
-			// another task already found the solution
-			if (interrupt.get()) {
-				return null;
-			}
-
+		private Grid<V> solve(final Grid<V> grid) {
 			if (!sudoku.isValid(grid)) {
 				return null;
 			}
@@ -116,39 +60,24 @@ public class ForkJoinSudokuSolver implements SudokuSolver {
 				.stream()
 				.filter(Cell::isEmpty)
 				.collect(Collectors.toList());
-			prioritize(grid, cells);
 			if (cells.isEmpty()) {
 				return null;
 			}
-
-			solution.iterations.incrementAndGet();
+			prioritize(grid, cells);
 
 			final var cell = cells.remove(0);
-			final var potentialCellValues = sudoku.getPotentialValuesForCell(grid, cell);
-			for (final V value : potentialCellValues) {
-				cell.setValue(value);
 
-				if (depth == forkDepth) {
-					final var clone = grid.copy();
-					final var task = new SudokuSolverRecursiveTask<>(sudoku, clone, solution,
-						depth++, interrupt);
-					tasks.add(task);
-					task.fork();
-				} else {
-					final var result = solve(grid, depth++);
-					if (result != null) {
-						return result;
-					}
-				}
-			}
-
-			cell.setValue(null);
-
-			return null;
-		}
-
-		private void joinAll() {
-			tasks.forEach(ForkJoinTask::join);
+			return sudoku.getPotentialValuesForCell(grid, cell)
+				.stream()
+				.peek(cell::setValue)
+				.map(value -> new SudokuSolverRecursiveTask<>(sudoku, grid.copy()))
+				.map(ForkJoinTask::fork)
+				.toList()
+				.stream()
+				.map(ForkJoinTask::join)
+				.filter(Objects::nonNull)
+				.findFirst()
+				.orElse(null);
 		}
 
 		private void prioritize(final Grid<V> grid, final List<Cell<V>> cells) {

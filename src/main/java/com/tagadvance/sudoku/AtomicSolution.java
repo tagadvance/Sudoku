@@ -1,18 +1,14 @@
 package com.tagadvance.sudoku;
 
 import com.google.common.base.MoreObjects;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class AtomicSolution<V> implements Solution<V> {
-
-	AtomicInteger iterations;
 
 	private Grid<V> grid;
 	private UnsolvableException exception = new UnsolvableException();
 
 	public AtomicSolution() {
 		super();
-		this.iterations = new AtomicInteger();
 	}
 
 	@Override
