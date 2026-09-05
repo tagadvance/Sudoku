@@ -2,16 +2,14 @@ package com.tagadvance.sudoku;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.MapMaker;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
 
 public class CompositeSudoku implements Sudoku {
 
@@ -19,19 +17,11 @@ public class CompositeSudoku implements Sudoku {
 	private final ImmutableSet<Scope> scopeSet;
 
 	/**
-	 * cache of scopes for cell
+	 * Cache of the scopes each cell belongs to. A cell belongs to exactly one grid, so the cell
+	 * alone identifies the entry; keying it weakly lets it die with that grid.
 	 */
-	private final LoadingCache<GridCellPair, ImmutableCollection<Scope>> scopeCache = CacheBuilder.newBuilder()
-		.build(new CacheLoader<>() {
-
-			@Override
-			public ImmutableCollection<Scope> load(final GridCellPair pair) {
-				return getScopes().stream()
-					.filter(scope -> scope.getCells(pair.grid).contains(pair.cell))
-					.collect(ImmutableList.toImmutableList());
-			}
-
-		});
+	private final ConcurrentMap<Cell, ImmutableCollection<Scope>> scopeCache = new MapMaker().weakKeys()
+		.makeMap();
 
 	/**
 	 * @param values
@@ -74,22 +64,9 @@ public class CompositeSudoku implements Sudoku {
 	}
 
 	private ImmutableCollection<Scope> getScopesForCell(final Grid grid, final Cell cell) {
-		return scopeCache.getUnchecked(new GridCellPair(grid, cell));
-	}
-
-	private record GridCellPair(Grid grid, Cell cell) {
-
-		@Override
-		public int hashCode() {
-			return Objects.hash(grid, cell);
-		}
-
-		@Override
-		public boolean equals(final Object o) {
-			return o instanceof GridCellPair that && Objects.equals(grid, that.grid)
-				&& Objects.equals(cell, that.cell);
-		}
-
+		return scopeCache.computeIfAbsent(cell, c -> getScopes().stream()
+			.filter(scope -> scope.getCells(grid).contains(c))
+			.collect(ImmutableList.toImmutableList()));
 	}
 
 }

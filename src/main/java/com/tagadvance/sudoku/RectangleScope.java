@@ -18,9 +18,11 @@ class RectangleScope implements Scope {
 	private final ImmutableSet<Point> pointSet;
 
 	/**
-	 * cache of scopes for cell
+	 * Cache of the cells this scope covers, per grid. Keyed weakly so an entry dies with the grid
+	 * copy it describes -- a solve discards thousands of them.
 	 */
 	private final LoadingCache<Grid, ImmutableCollection<Cell>> cellCache = CacheBuilder.newBuilder()
+		.weakKeys()
 		.build(new CacheLoader<>() {
 
 			@Override
