@@ -33,6 +33,8 @@ public class SudokuBuilder {
 	}
 
 	/**
+	 * Sets the alphabet, which also sets the size.
+	 *
 	 * @param values the alphabet, one symbol per row, column and block
 	 */
 	public SudokuBuilder values(final Set<Character> values) {
@@ -73,7 +75,7 @@ public class SudokuBuilder {
 	public interface SudokuFactory {
 
 		/**
-		 * @return the alphabet these puzzles are written in, for {@link Grid#populate}
+		 * Returns the alphabet these puzzles are written in, for {@link Grid#populate}.
 		 */
 		ImmutableSet<Character> getValues();
 
