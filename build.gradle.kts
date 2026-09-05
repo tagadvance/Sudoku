@@ -9,14 +9,19 @@ repositories {
 }
 
 dependencies {
-    testImplementation("org.junit.jupiter:junit-jupiter:5.+")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.+")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation("org.mockito:mockito-core:3.+")
-    testImplementation("com.google.guava:guava-testlib:33.4.8-jre")
-
+    implementation(platform("com.google.guava:guava-bom:33.7.1-jre"))
+    implementation("com.google.guava:guava")
     implementation("org.apache.commons:commons-math3:3.6.1")
-    implementation("com.google.guava:guava:33.4.8-jre")
+
+    testImplementation(platform("org.junit:junit-bom:6.1.3"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.junit.jupiter:junit-jupiter-params")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    testImplementation(platform("org.mockito:mockito-bom:5.23.0"))
+    testImplementation("org.mockito:mockito-core")
+
+    testImplementation("com.google.guava:guava-testlib")
 }
 
 java {
