@@ -37,6 +37,13 @@ tasks.withType<JavaCompile>().configureEach {
     options.compilerArgs.add("-Xlint:all")
 }
 
+tasks.register<JavaExec>("benchmark") {
+    group = "verification"
+    description = "Measures solver work -- operation counts and allocated bytes, not just wall clock."
+    classpath = sourceSets["test"].runtimeClasspath
+    mainClass.set("com.tagadvance.sudoku.Benchmark")
+}
+
 tasks.named<Test>("test") {
     useJUnitPlatform()
 }
