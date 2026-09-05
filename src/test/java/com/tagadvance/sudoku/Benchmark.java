@@ -3,7 +3,6 @@ package com.tagadvance.sudoku;
 import static java.util.function.Predicate.not;
 
 import com.tagadvance.geometry.Dimension;
-import com.tagadvance.geometry.Point;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
@@ -12,7 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -138,10 +136,15 @@ public final class Benchmark {
 		}
 
 		@Override
-		public Set<Character> getPotentialValues(final Grid grid, final Point point) {
+		public int candidates(final Grid grid, final int position) {
 			counters.candidateLookups++;
 
-			return delegate.getPotentialValues(grid, point);
+			return delegate.candidates(grid, position);
+		}
+
+		@Override
+		public char symbol(final int ordinal) {
+			return delegate.symbol(ordinal);
 		}
 
 		@Override
@@ -175,8 +178,18 @@ public final class Benchmark {
 		}
 
 		@Override
-		public Cell getCellAt(final Point point) {
-			return delegate.getCellAt(point);
+		public int size() {
+			return delegate.size();
+		}
+
+		@Override
+		public char get(final int position) {
+			return delegate.get(position);
+		}
+
+		@Override
+		public void set(final int position, final char value) {
+			delegate.set(position, value);
 		}
 
 	}

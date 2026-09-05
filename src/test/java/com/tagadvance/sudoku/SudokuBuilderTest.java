@@ -68,7 +68,7 @@ class SudokuBuilderTest {
 	@Test
 	@DisplayName("rejects an alphabet containing the empty sentinel")
 	void rejectsEmptySentinelAsValue() {
-		final var builder = SudokuBuilder.newBuilder().values(ImmutableSet.of('1', Cell.EMPTY));
+		final var builder = SudokuBuilder.newBuilder().values(ImmutableSet.of('1', Grid.EMPTY));
 		final var e = assertThrows(IllegalArgumentException.class, builder::createSudokuFactory);
 
 		assertEquals("values must not contain the empty sentinel", e.getMessage());

@@ -63,7 +63,7 @@ public class SudokuBuilder {
 
 	public SudokuFactory createSudokuFactory() {
 		checkArgument(!values.isEmpty(), "values must not be empty");
-		checkArgument(!values.contains(Cell.EMPTY), "values must not contain the empty sentinel");
+		checkArgument(!values.contains(Grid.EMPTY), "values must not contain the empty sentinel");
 
 		return new DefaultSudokuFactory(values, scopeFactory);
 	}

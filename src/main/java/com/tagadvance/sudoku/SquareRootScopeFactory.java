@@ -27,7 +27,7 @@ public class SquareRootScopeFactory implements ScopeFactory {
 			for (int y = 0, v = 0; v < blockSize; y += blockSize, v++) {
 				for (int x = 0, h = 0; h < blockSize; x += blockSize, h++) {
 					final var rectangle = new Rectangle(x, y, blockSize, blockSize);
-					final var scope = new RectangleScope(rectangle);
+					final var scope = new RectangleScope(rectangle, size);
 					scopes.add(scope);
 				}
 			}
@@ -38,7 +38,7 @@ public class SquareRootScopeFactory implements ScopeFactory {
 		final int regionWidth = 1;
 		for (x = 0; x < width; x++) {
 			final var rectangle = new Rectangle(x, y, regionWidth, height);
-			final var scope = new RectangleScope(rectangle);
+			final var scope = new RectangleScope(rectangle, size);
 			scopes.add(scope);
 		}
 
@@ -47,7 +47,7 @@ public class SquareRootScopeFactory implements ScopeFactory {
 		int regionHeight = 1;
 		for (y = 0; y < height; y++) {
 			final var rectangle = new Rectangle(x, y, width, regionHeight);
-			final var scope = new RectangleScope(rectangle);
+			final var scope = new RectangleScope(rectangle, size);
 			scopes.add(scope);
 		}
 

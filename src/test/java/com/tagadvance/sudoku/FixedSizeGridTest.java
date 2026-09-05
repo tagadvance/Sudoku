@@ -17,7 +17,7 @@ class FixedSizeGridTest {
 		final int width = 9, height = 9;
 		final var grid = new FixedSizeGrid(new Dimension(width, height));
 
-		assertEquals(width * height, grid.getEmptyPoints().size());
+		assertEquals(width * height, grid.countEmpty());
 	}
 
 	@Test
@@ -28,9 +28,9 @@ class FixedSizeGridTest {
 
 		grid.populate("AB.?", values);
 
-		assertEquals('A', grid.getCellAt(new Point(0, 0)).getValue());
-		assertEquals('B', grid.getCellAt(new Point(1, 0)).getValue());
-		assertEquals(2, grid.getEmptyPoints().size());
+		assertEquals('A', grid.get(new Point(0, 0)));
+		assertEquals('B', grid.get(new Point(1, 0)));
+		assertEquals(2, grid.countEmpty());
 	}
 
 	@Test

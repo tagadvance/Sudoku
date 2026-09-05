@@ -1,8 +1,6 @@
 package com.tagadvance.sudoku;
 
 import com.google.common.collect.ImmutableSet;
-import com.tagadvance.geometry.Point;
-import java.util.Set;
 
 public interface Sudoku extends Copyable<Sudoku> {
 
@@ -10,14 +8,22 @@ public interface Sudoku extends Copyable<Sudoku> {
 
 	ImmutableSet<Scope> getScopes();
 
-	Set<Character> getPotentialValues(Grid grid, Point point);
+	/**
+	 * Returns the values that could still go at this position, as a bitmask: bit k is set when the
+	 * symbol with ordinal k is still available. A mask rather than a set because this is the hot
+	 * path -- a solve asks tens of thousands of times, and {@link Integer#bitCount} answers "how
+	 * constrained is this position" in one instruction.
+	 */
+	int candidates(Grid grid, int position);
 
-	default boolean isValid(final Grid grid) {
-		return getScopes().stream().allMatch(scope -> scope.isValid(grid));
-	}
+	/**
+	 * Returns the symbol with the given ordinal, which is the bit position used by
+	 * {@link #candidates}.
+	 */
+	char symbol(int ordinal);
 
-	default boolean isSolved(Grid grid) {
-		return getScopes().stream().allMatch(scope -> scope.isSolved(grid));
-	}
+	boolean isValid(Grid grid);
+
+	boolean isSolved(Grid grid);
 
 }

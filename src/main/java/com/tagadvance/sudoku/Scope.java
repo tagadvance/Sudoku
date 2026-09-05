@@ -1,41 +1,17 @@
 package com.tagadvance.sudoku;
 
-import static java.util.function.Predicate.not;
+import com.google.common.primitives.ImmutableIntArray;
 
-import com.google.common.collect.ImmutableSet;
-import com.tagadvance.geometry.Point;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+/**
+ * A set of positions that must hold distinct values -- a row, a column, a block, and equally a
+ * diagonal or an irregular cage. Pure geometry: it carries no values and knows no grid, so one
+ * instance is shared by every grid and every copy of one.
+ */
 public interface Scope {
 
 	/**
-	 * The positions this scope covers, which must hold distinct values. Geometry, not state: the
-	 * same for every grid and every copy of one, which is why nothing here caches per grid.
+	 * Returns the positions this scope covers, as indices into a grid.
 	 */
-	ImmutableSet<Point> getPoints();
-
-	default Stream<Character> values(final Grid grid) {
-		return getPoints().stream()
-			.map(grid::getCellAt)
-			.filter(not(Cell::isEmpty))
-			.map(Cell::getValue);
-	}
-
-	default Collection<Character> getUsedValues(final Grid grid) {
-		return values(grid).collect(Collectors.toSet());
-	}
-
-	default boolean isValid(final Grid grid) {
-		final var seen = new HashSet<Character>();
-
-		return values(grid).allMatch(seen::add);
-	}
-
-	default boolean isSolved(final Grid grid) {
-		return values(grid).distinct().count() == getPoints().size();
-	}
+	ImmutableIntArray getPositions();
 
 }

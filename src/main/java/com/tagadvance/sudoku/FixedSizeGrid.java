@@ -4,24 +4,20 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.StandardSystemProperty;
-import com.google.common.collect.ImmutableMap;
 import com.tagadvance.geometry.Dimension;
-import com.tagadvance.geometry.Point;
-import java.util.Map.Entry;
-import java.util.function.Function;
 
 public class FixedSizeGrid implements Grid {
 
 	public static final byte MIN_SIZE = 1, MAX_SIZE = 25;
 
 	/**
-	 * How an empty cell prints. {@link Cell#EMPTY} itself is not printable.
+	 * How an empty position prints. {@link Grid#EMPTY} itself is not printable.
 	 */
 	private static final char BLANK = '.';
 
 	private final Dimension size;
 
-	private final ImmutableMap<Point, Cell> cellMap;
+	private final char[] cells;
 
 	public FixedSizeGrid(final Dimension size) {
 		super();
@@ -32,37 +28,39 @@ public class FixedSizeGrid implements Grid {
 		checkArgument(size.height() >= MIN_SIZE, "height must be >= %s", MIN_SIZE);
 		checkArgument(size.height() <= MAX_SIZE, "height must be <= %s", MAX_SIZE);
 
-		this.cellMap = size.stream()
-			.collect(ImmutableMap.toImmutableMap(Function.identity(), p -> new MutableCell()));
+		// char[] is born full of '\0', which is EMPTY
+		this.cells = new char[size.width() * size.height()];
 	}
 
-	private FixedSizeGrid(final Dimension size, final ImmutableMap<Point, Cell> cellMap) {
+	private FixedSizeGrid(final Dimension size, final char[] cells) {
 		super();
 		this.size = size;
-		this.cellMap = cellMap;
+		this.cells = cells;
 	}
 
 	@Override
 	public FixedSizeGrid copy() {
-		final ImmutableMap<Point, Cell> copy = cellMap.entrySet()
-			.stream()
-			.collect(ImmutableMap.toImmutableMap(Entry::getKey, e -> {
-				final var value = e.getValue().getValue();
-
-				return new MutableCell(value);
-			}));
-
-		return new FixedSizeGrid(size, copy);
+		return new FixedSizeGrid(size, cells.clone());
 	}
 
 	@Override
 	public Dimension getSize() {
-		return this.size;
+		return size;
 	}
 
 	@Override
-	public Cell getCellAt(final Point point) {
-		return cellMap.get(point);
+	public int size() {
+		return cells.length;
+	}
+
+	@Override
+	public char get(final int position) {
+		return cells[position];
+	}
+
+	@Override
+	public void set(final int position, final char value) {
+		cells[position] = value;
 	}
 
 	@Override
@@ -70,11 +68,11 @@ public class FixedSizeGrid implements Grid {
 		final var sb = new StringBuilder();
 		for (int y = 0; y < size.height(); y++) {
 			for (int x = 0; x < size.width(); x++) {
-				final var cell = getCellAt(new Point(x, y));
+				final char value = cells[(y * size.width()) + x];
 				if (x > 0) {
 					sb.append(" ");
 				}
-				sb.append(cell.isEmpty() ? BLANK : cell.getValue());
+				sb.append(value == EMPTY ? BLANK : value);
 			}
 			if (y < size.height() - 1) {
 				sb.append(StandardSystemProperty.LINE_SEPARATOR.value());

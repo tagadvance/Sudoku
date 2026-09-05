@@ -18,7 +18,7 @@ class SquareRootScopeFactoryTest {
 
 		final int x = 0, y = 0, width = 1, height = 1;
 		final var expectedScopes = ImmutableSet.<Scope>of(
-			new RectangleScope(new Rectangle(x, y, width, height)));
+			new RectangleScope(new Rectangle(x, y, width, height), new Dimension(width, height)));
 
 		final var grid = mock(Grid.class);
 		final var size = new Dimension(width, height);
@@ -36,11 +36,11 @@ class SquareRootScopeFactoryTest {
 		final int width = 2, height = 2;
 		final var expectedScopes = ImmutableSet.<Scope>of(
 			// rows
-			new RectangleScope(new Rectangle(0, 0, width, 1)),
-			new RectangleScope(new Rectangle(0, 1, width, 1)),
+			new RectangleScope(new Rectangle(0, 0, width, 1), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(0, 1, width, 1), new Dimension(width, height)),
 			// columns
-			new RectangleScope(new Rectangle(0, 0, 1, height)),
-			new RectangleScope(new Rectangle(1, 0, 1, height)));
+			new RectangleScope(new Rectangle(0, 0, 1, height), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(1, 0, 1, height), new Dimension(width, height)));
 
 		final var grid = (Grid) mock(Grid.class);
 		final var size = new Dimension(width, height);
@@ -58,13 +58,13 @@ class SquareRootScopeFactoryTest {
 		final int width = 3, height = 3;
 		final var expectedScopes = ImmutableSet.<Scope>of(
 			// rows
-			new RectangleScope(new Rectangle(0, 0, width, 1)),
-			new RectangleScope(new Rectangle(0, 1, width, 1)),
-			new RectangleScope(new Rectangle(0, 2, width, 1)),
+			new RectangleScope(new Rectangle(0, 0, width, 1), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(0, 1, width, 1), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(0, 2, width, 1), new Dimension(width, height)),
 			// columns
-			new RectangleScope(new Rectangle(0, 0, 1, height)),
-			new RectangleScope(new Rectangle(1, 0, 1, height)),
-			new RectangleScope(new Rectangle(2, 0, 1, height)));
+			new RectangleScope(new Rectangle(0, 0, 1, height), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(1, 0, 1, height), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(2, 0, 1, height), new Dimension(width, height)));
 
 		final var grid = (Grid) mock(Grid.class);
 		final var size = new Dimension(width, height);
@@ -82,20 +82,20 @@ class SquareRootScopeFactoryTest {
 		final int width = 4, height = 4, blockSize = 2;
 		ImmutableSet<Scope> expectedScopes = ImmutableSet.of(
 			// rows
-			new RectangleScope(new Rectangle(0, 0, width, 1)),
-			new RectangleScope(new Rectangle(0, 1, width, 1)),
-			new RectangleScope(new Rectangle(0, 2, width, 1)),
-			new RectangleScope(new Rectangle(0, 3, width, 1)),
+			new RectangleScope(new Rectangle(0, 0, width, 1), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(0, 1, width, 1), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(0, 2, width, 1), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(0, 3, width, 1), new Dimension(width, height)),
 			// columns
-			new RectangleScope(new Rectangle(0, 0, 1, height)),
-			new RectangleScope(new Rectangle(1, 0, 1, height)),
-			new RectangleScope(new Rectangle(2, 0, 1, height)),
-			new RectangleScope(new Rectangle(3, 0, 1, height)),
+			new RectangleScope(new Rectangle(0, 0, 1, height), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(1, 0, 1, height), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(2, 0, 1, height), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(3, 0, 1, height), new Dimension(width, height)),
 			// blocks
-			new RectangleScope(new Rectangle(0, 0, blockSize, blockSize)),
-			new RectangleScope(new Rectangle(2, 0, blockSize, blockSize)),
-			new RectangleScope(new Rectangle(0, 2, blockSize, blockSize)),
-			new RectangleScope(new Rectangle(2, 2, blockSize, blockSize)));
+			new RectangleScope(new Rectangle(0, 0, blockSize, blockSize), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(2, 0, blockSize, blockSize), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(0, 2, blockSize, blockSize), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(2, 2, blockSize, blockSize), new Dimension(width, height)));
 
 		final var grid = (Grid) mock(Grid.class);
 		final var size = new Dimension(width, height);
@@ -113,35 +113,35 @@ class SquareRootScopeFactoryTest {
 		final int width = 9, height = 9, blockSize = 3;
 		final var expectedScopes = ImmutableSet.<Scope>of(
 			// rows
-			new RectangleScope(new Rectangle(0, 0, width, 1)),
-			new RectangleScope(new Rectangle(0, 1, width, 1)),
-			new RectangleScope(new Rectangle(0, 2, width, 1)),
-			new RectangleScope(new Rectangle(0, 3, width, 1)),
-			new RectangleScope(new Rectangle(0, 4, width, 1)),
-			new RectangleScope(new Rectangle(0, 5, width, 1)),
-			new RectangleScope(new Rectangle(0, 6, width, 1)),
-			new RectangleScope(new Rectangle(0, 7, width, 1)),
-			new RectangleScope(new Rectangle(0, 8, width, 1)),
+			new RectangleScope(new Rectangle(0, 0, width, 1), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(0, 1, width, 1), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(0, 2, width, 1), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(0, 3, width, 1), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(0, 4, width, 1), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(0, 5, width, 1), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(0, 6, width, 1), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(0, 7, width, 1), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(0, 8, width, 1), new Dimension(width, height)),
 			// columns
-			new RectangleScope(new Rectangle(0, 0, 1, height)),
-			new RectangleScope(new Rectangle(1, 0, 1, height)),
-			new RectangleScope(new Rectangle(2, 0, 1, height)),
-			new RectangleScope(new Rectangle(3, 0, 1, height)),
-			new RectangleScope(new Rectangle(4, 0, 1, height)),
-			new RectangleScope(new Rectangle(5, 0, 1, height)),
-			new RectangleScope(new Rectangle(6, 0, 1, height)),
-			new RectangleScope(new Rectangle(7, 0, 1, height)),
-			new RectangleScope(new Rectangle(8, 0, 1, height)),
+			new RectangleScope(new Rectangle(0, 0, 1, height), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(1, 0, 1, height), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(2, 0, 1, height), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(3, 0, 1, height), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(4, 0, 1, height), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(5, 0, 1, height), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(6, 0, 1, height), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(7, 0, 1, height), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(8, 0, 1, height), new Dimension(width, height)),
 			// blocks
-			new RectangleScope(new Rectangle(0, 0, blockSize, blockSize)),
-			new RectangleScope(new Rectangle(3, 0, blockSize, blockSize)),
-			new RectangleScope(new Rectangle(6, 0, blockSize, blockSize)),
-			new RectangleScope(new Rectangle(0, 3, blockSize, blockSize)),
-			new RectangleScope(new Rectangle(3, 3, blockSize, blockSize)),
-			new RectangleScope(new Rectangle(6, 3, blockSize, blockSize)),
-			new RectangleScope(new Rectangle(0, 6, blockSize, blockSize)),
-			new RectangleScope(new Rectangle(3, 6, blockSize, blockSize)),
-			new RectangleScope(new Rectangle(6, 6, blockSize, blockSize)));
+			new RectangleScope(new Rectangle(0, 0, blockSize, blockSize), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(3, 0, blockSize, blockSize), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(6, 0, blockSize, blockSize), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(0, 3, blockSize, blockSize), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(3, 3, blockSize, blockSize), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(6, 3, blockSize, blockSize), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(0, 6, blockSize, blockSize), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(3, 6, blockSize, blockSize), new Dimension(width, height)),
+			new RectangleScope(new Rectangle(6, 6, blockSize, blockSize), new Dimension(width, height)));
 
 		final var grid = (Grid) mock(Grid.class);
 		final var size = new Dimension(width, height);
