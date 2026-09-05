@@ -24,9 +24,7 @@ dependencies {
 
     testImplementation("com.google.guava:guava-testlib")
 
-    // 2.42.0 is the last release that runs on a Java 17 JVM; raising it
-    // requires raising the toolchain first.
-    errorprone("com.google.errorprone:error_prone_core:2.42.0")
+    errorprone("com.google.errorprone:error_prone_core:2.50.0")
 }
 
 java {
