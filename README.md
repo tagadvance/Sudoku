@@ -1,4 +1,9 @@
 # Sudoku
+
+[![CI](https://github.com/tagadvance/Sudoku/actions/workflows/ci.yml/badge.svg)](https://github.com/tagadvance/Sudoku/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/tagadvance/Sudoku)](LICENSE)
+[![Java](https://img.shields.io/badge/Java-17%2B-007396?logo=openjdk&logoColor=white)](https://adoptium.net)
+
 Sudoku solving algorithm written in Java.
 
 This is a sudoku solver I originally wrote in April of 2012 (based on the last modified date).
@@ -13,3 +18,7 @@ The algorithm works roughly like this:
 1. For each cell, iterate over the possible values and assign the value to the cell.
 1. After a value is assigned, recurse to step 1, until a solution is found.
 1. If no solution is found, throw an UnsolvableException.
+
+---
+
+If you find this useful, you can [sponsor me on GitHub](https://github.com/sponsors/tagadvance).
