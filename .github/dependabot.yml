@@ -1,0 +1,16 @@
+version: 2
+
+updates:
+  - package-ecosystem: gradle
+    directory: /
+    schedule:
+      interval: weekly
+    ignore:
+      # error_prone_core 2.43+ needs a Java 21 JVM; the project floor is 17.
+      - dependency-name: com.google.errorprone:error_prone_core
+        versions: ['>=2.43.0']
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
