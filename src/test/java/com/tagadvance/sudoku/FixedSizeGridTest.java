@@ -34,6 +34,15 @@ class FixedSizeGridTest {
 	}
 
 	@Test
+	@DisplayName("prints a blank for every empty cell")
+	void toStringRendersEmptyCells() {
+		final var grid = new FixedSizeGrid(new Dimension(2, 2));
+		grid.populate("A..B", ImmutableSet.of('A', 'B'));
+
+		assertEquals(String.join(System.lineSeparator(), "A .", ". B"), grid.toString());
+	}
+
+	@Test
 	@DisplayName("rejects a puzzle that is not one character per cell")
 	void populateWrongLength() {
 		final var grid = new FixedSizeGrid(new Dimension(2, 2));

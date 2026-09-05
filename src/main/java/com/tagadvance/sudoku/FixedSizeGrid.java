@@ -15,6 +15,11 @@ public class FixedSizeGrid implements Grid {
 
 	public static final byte MIN_SIZE = 1, MAX_SIZE = 25;
 
+	/**
+	 * How an empty cell prints. {@link Cell#EMPTY} itself is not printable.
+	 */
+	private static final char BLANK = '.';
+
 	private final Dimension size;
 
 	private final ImmutableMap<Point, Cell> cellMap;
@@ -66,19 +71,16 @@ public class FixedSizeGrid implements Grid {
 		return cellMap.get(point);
 	}
 
-	// TODO: unit test
 	@Override
 	public String toString() {
 		final var sb = new StringBuilder();
 		for (int y = 0; y < size.height(); y++) {
 			for (int x = 0; x < size.width(); x++) {
-				Point point = new Point(x, y);
-				Cell cell = getCellAt(point);
-				char value = cell.getValue();
+				final var cell = getCellAt(new Point(x, y));
 				if (x > 0) {
 					sb.append(" ");
 				}
-				sb.append(value);
+				sb.append(cell.isEmpty() ? BLANK : cell.getValue());
 			}
 			if (y < size.height() - 1) {
 				sb.append(StandardSystemProperty.LINE_SEPARATOR.value());

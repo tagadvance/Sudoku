@@ -4,9 +4,10 @@ package com.tagadvance.sudoku;
 public interface Cell {
 
 	/**
-	 * The value of a cell that has not been filled in.
+	 * The value of a cell that has not been filled in. NUL is not a legal puzzle character, so no
+	 * value alphabet can collide with it, and it is what a {@code char} field defaults to.
 	 */
-	char EMPTY = '0';
+	char EMPTY = '\0';
 
 	boolean isEmpty();
 
