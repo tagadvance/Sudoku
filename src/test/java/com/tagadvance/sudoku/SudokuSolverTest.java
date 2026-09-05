@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -29,9 +30,7 @@ class SudokuSolverTest {
 		final var scopes = scopeFactory.createScopes(grid);
 		final var sudoku = new CompositeSudoku(values, scopes);
 
-		return Stream.of(new SimpleSudokuSolver()/*, new ForkJoinSudokuSolver()*/)
-			.flatMap(
-				solver -> puzzles.stream().map(puzzle -> new Object[]{solver, sudoku, puzzle}));
+		return puzzles.stream().map(puzzle -> new Object[]{sudoku, puzzle});
 	}
 
 	private static Stream<Grid> readPuzzles(final Grid grid) throws IOException {
@@ -57,9 +56,9 @@ class SudokuSolverTest {
 
 	@ParameterizedTest
 	@MethodSource("createParameters")
-	// TODO: performance test both
-	void solveReturnsSolvedSudoku(SudokuSolver solver, Sudoku sudoku, Grid grid) {
-		final var solution = solver.solve(sudoku, grid);
+	@DisplayName("solves every puzzle in puzzles.txt")
+	void solve(Sudoku sudoku, Grid grid) {
+		final var solution = new SimpleSudokuSolver().solve(sudoku, grid);
 
 		assertTrue(sudoku.isSolved(solution));
 	}
