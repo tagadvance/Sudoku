@@ -23,10 +23,10 @@ public class FixedSizeGrid implements Grid {
 		super();
 		this.size = checkNotNull(size, "size must not be null");
 
-		checkArgument(size.width() >= MIN_SIZE, "width must be >= %d", MIN_SIZE);
-		checkArgument(size.width() <= MAX_SIZE, "width must be <= %d", MAX_SIZE);
-		checkArgument(size.height() >= MIN_SIZE, "height must be >= %d", MIN_SIZE);
-		checkArgument(size.height() <= MAX_SIZE, "height must be <= %d", MAX_SIZE);
+		checkArgument(size.width() >= MIN_SIZE, "width must be >= %s", MIN_SIZE);
+		checkArgument(size.width() <= MAX_SIZE, "width must be <= %s", MAX_SIZE);
+		checkArgument(size.height() >= MIN_SIZE, "height must be >= %s", MIN_SIZE);
+		checkArgument(size.height() <= MAX_SIZE, "height must be <= %s", MAX_SIZE);
 
 		this.cellMap = size.stream()
 			.collect(ImmutableMap.toImmutableMap(Function.identity(), p -> new MutableCell()));
