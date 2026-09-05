@@ -2,14 +2,16 @@ package com.tagadvance.sudoku;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.MapMaker;
-import java.util.Collection;
+import com.tagadvance.geometry.Point;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * A sudoku defined by its value alphabet and a set of scopes. Nothing here assumes 9x9 or digits;
@@ -21,11 +23,10 @@ public class CompositeSudoku implements Sudoku {
 	private final ImmutableSet<Scope> scopeSet;
 
 	/**
-	 * Cache of the scopes each cell belongs to. A cell belongs to exactly one grid, so the cell
-	 * alone identifies the entry; keying it weakly lets it die with that grid.
+	 * The scopes covering each position. Pure geometry, so it is computed once here and shared by
+	 * every grid -- there is nothing per-grid left to cache.
 	 */
-	private final ConcurrentMap<Cell, ImmutableCollection<Scope>> scopeCache = new MapMaker().weakKeys()
-		.makeMap();
+	private final ImmutableMap<Point, ImmutableList<Scope>> scopesByPoint;
 
 	/**
 	 * @param values the alphabet, one symbol per row, column and block
@@ -35,6 +36,17 @@ public class CompositeSudoku implements Sudoku {
 		super();
 		this.values = ImmutableSet.copyOf(checkNotNull(values, "values must not be null"));
 		this.scopeSet = ImmutableSet.copyOf(checkNotNull(scopeSet, "scopeSet must not be null"));
+
+		final Map<Point, List<Scope>> byPoint = new HashMap<>();
+		for (final var scope : this.scopeSet) {
+			for (final var point : scope.getPoints()) {
+				byPoint.computeIfAbsent(point, p -> new ArrayList<>()).add(scope);
+			}
+		}
+		this.scopesByPoint = byPoint.entrySet()
+			.stream()
+			.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey,
+				e -> ImmutableList.copyOf(e.getValue())));
 	}
 
 	@Override
@@ -54,22 +66,14 @@ public class CompositeSudoku implements Sudoku {
 	}
 
 	@Override
-	// TODO: Fix smelly code
-	public Set<Character> getPotentialValuesForCell(final Grid grid, final Cell cell) {
+	// TODO: a HashSet of boxed Characters per call is the hot path; wants a bitmask
+	public Set<Character> getPotentialValues(final Grid grid, final Point point) {
 		final var values = new HashSet<>(this.values);
-		getScopesForCell(grid, cell).stream()
-			.map(scope -> scope.getUsedValues(grid))
-			.flatMap(Collection::stream)
-			.distinct()
-			.forEach(values::remove);
+		for (final var scope : scopesByPoint.getOrDefault(point, ImmutableList.of())) {
+			values.removeAll(scope.getUsedValues(grid));
+		}
 
 		return values;
-	}
-
-	private ImmutableCollection<Scope> getScopesForCell(final Grid grid, final Cell cell) {
-		return scopeCache.computeIfAbsent(cell, c -> getScopes().stream()
-			.filter(scope -> scope.getCells(grid).contains(c))
-			.collect(ImmutableList.toImmutableList()));
 	}
 
 }

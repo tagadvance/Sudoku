@@ -3,7 +3,6 @@ package com.tagadvance.sudoku;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableCollection;
 import com.tagadvance.geometry.Dimension;
 import com.tagadvance.geometry.Point;
 import java.util.List;
@@ -40,17 +39,14 @@ public interface Grid extends Copyable<Grid> {
 	Dimension getSize();
 
 	/**
-	 * @return the empty cells, in a list the caller is free to sort and consume -- the solvers do
-	 * both
+	 * Returns the positions of the empty cells, in a list the caller is free to sort and consume --
+	 * the solver does both.
 	 */
-	default List<Cell> getEmptyCells() {
-		return getCells()
-			.stream()
-			.filter(Cell::isEmpty)
+	default List<Point> getEmptyPoints() {
+		return getSize().stream()
+			.filter(point -> getCellAt(point).isEmpty())
 			.collect(Collectors.toList());
 	}
-
-	ImmutableCollection<Cell> getCells();
 
 	Cell getCellAt(Point point);
 

@@ -2,6 +2,7 @@ package com.tagadvance.sudoku;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.tagadvance.geometry.Point;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -48,16 +49,16 @@ public class SimpleSudokuSolver implements SudokuSolver {
 		}
 
 		private Grid solve(final Grid grid) {
-			final var cells = grid.getEmptyCells();
-			prioritize(grid, cells);
+			final var points = grid.getEmptyPoints();
+			prioritize(grid, points);
 
-			final var cell = cells.remove(0);
-			final var potentialCellValues = sudoku.getPotentialValuesForCell(grid, cell);
-			for (final char value : potentialCellValues) {
+			final var point = points.remove(0);
+			final var cell = grid.getCellAt(point);
+			for (final char value : sudoku.getPotentialValues(grid, point)) {
 				cell.setValue(value);
 				if (sudoku.isSolved(grid)) {
 					return grid;
-				} else if (cells.isEmpty()) {
+				} else if (points.isEmpty()) {
 					return null;
 				}
 
@@ -72,13 +73,13 @@ public class SimpleSudokuSolver implements SudokuSolver {
 			return null;
 		}
 
-		private void prioritize(final Grid grid, final List<Cell> emptyCells) {
-			final Map<Cell, Integer> cells = emptyCells.stream()
+		private void prioritize(final Grid grid, final List<Point> emptyPoints) {
+			final Map<Point, Integer> counts = emptyPoints.stream()
 				.collect(Collectors.toMap(Function.identity(),
-					cell -> sudoku.getPotentialValuesForCell(grid, cell).size()));
+					point -> sudoku.getPotentialValues(grid, point).size()));
 
 			// sort from least to greatest
-			emptyCells.sort(Comparator.comparing(cells::get));
+			emptyPoints.sort(Comparator.comparing(counts::get));
 		}
 
 	}

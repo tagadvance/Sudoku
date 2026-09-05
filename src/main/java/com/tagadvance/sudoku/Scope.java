@@ -2,34 +2,40 @@ package com.tagadvance.sudoku;
 
 import static java.util.function.Predicate.not;
 
+import com.google.common.collect.ImmutableSet;
+import com.tagadvance.geometry.Point;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-// TODO: replace with array reference
 public interface Scope {
 
-	default Stream<Character> values(Grid grid) {
-		return getCells(grid).stream().filter(not(Cell::isEmpty)).map(Cell::getValue);
-	}
+	/**
+	 * The positions this scope covers, which must hold distinct values. Geometry, not state: the
+	 * same for every grid and every copy of one, which is why nothing here caches per grid.
+	 */
+	ImmutableSet<Point> getPoints();
 
-	Collection<Cell> getCells(Grid grid);
+	default Stream<Character> values(final Grid grid) {
+		return getPoints().stream()
+			.map(grid::getCellAt)
+			.filter(not(Cell::isEmpty))
+			.map(Cell::getValue);
+	}
 
 	default Collection<Character> getUsedValues(final Grid grid) {
 		return values(grid).collect(Collectors.toSet());
 	}
 
 	default boolean isValid(final Grid grid) {
-		final var set = new HashSet<>();
+		final var seen = new HashSet<Character>();
 
-		return values(grid).allMatch(set::add);
+		return values(grid).allMatch(seen::add);
 	}
 
 	default boolean isSolved(final Grid grid) {
-		final var cells = getCells(grid);
-
-		return values(grid).distinct().count() == cells.size();
+		return values(grid).distinct().count() == getPoints().size();
 	}
 
 }

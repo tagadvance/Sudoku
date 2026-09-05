@@ -1,6 +1,7 @@
 package com.tagadvance.sudoku;
 
 import com.google.common.collect.ImmutableSet;
+import com.tagadvance.geometry.Point;
 import java.util.Set;
 
 public interface Sudoku extends Copyable<Sudoku> {
@@ -9,7 +10,7 @@ public interface Sudoku extends Copyable<Sudoku> {
 
 	ImmutableSet<Scope> getScopes();
 
-	Set<Character> getPotentialValuesForCell(Grid grid, Cell cell);
+	Set<Character> getPotentialValues(Grid grid, Point point);
 
 	default boolean isValid(final Grid grid) {
 		return getScopes().stream().allMatch(scope -> scope.isValid(grid));

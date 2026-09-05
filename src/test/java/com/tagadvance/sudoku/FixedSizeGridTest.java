@@ -17,7 +17,7 @@ class FixedSizeGridTest {
 		final int width = 9, height = 9;
 		final var grid = new FixedSizeGrid(new Dimension(width, height));
 
-		assertEquals(width * height, grid.getEmptyCells().size());
+		assertEquals(width * height, grid.getEmptyPoints().size());
 	}
 
 	@Test
@@ -30,7 +30,7 @@ class FixedSizeGridTest {
 
 		assertEquals('A', grid.getCellAt(new Point(0, 0)).getValue());
 		assertEquals('B', grid.getCellAt(new Point(1, 0)).getValue());
-		assertEquals(2, grid.getEmptyCells().size());
+		assertEquals(2, grid.getEmptyPoints().size());
 	}
 
 	@Test

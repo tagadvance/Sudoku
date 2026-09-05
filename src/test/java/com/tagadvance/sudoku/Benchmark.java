@@ -2,7 +2,6 @@ package com.tagadvance.sudoku;
 
 import static java.util.function.Predicate.not;
 
-import com.google.common.collect.ImmutableCollection;
 import com.tagadvance.geometry.Dimension;
 import com.tagadvance.geometry.Point;
 import java.io.IOException;
@@ -139,10 +138,10 @@ public final class Benchmark {
 		}
 
 		@Override
-		public Set<Character> getPotentialValuesForCell(final Grid grid, final Cell cell) {
+		public Set<Character> getPotentialValues(final Grid grid, final Point point) {
 			counters.candidateLookups++;
 
-			return delegate.getPotentialValuesForCell(grid, cell);
+			return delegate.getPotentialValues(grid, point);
 		}
 
 		@Override
@@ -173,11 +172,6 @@ public final class Benchmark {
 		@Override
 		public Dimension getSize() {
 			return delegate.getSize();
-		}
-
-		@Override
-		public ImmutableCollection<Cell> getCells() {
-			return delegate.getCells();
 		}
 
 		@Override

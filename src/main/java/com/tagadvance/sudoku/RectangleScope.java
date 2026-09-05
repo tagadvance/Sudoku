@@ -2,11 +2,6 @@ package com.tagadvance.sudoku;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.ImmutableCollection;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.tagadvance.geometry.Point;
 import com.tagadvance.geometry.Rectangle;
@@ -17,23 +12,6 @@ class RectangleScope implements Scope {
 	private final Rectangle rectangle;
 	private final ImmutableSet<Point> pointSet;
 
-	/**
-	 * Cache of the cells this scope covers, per grid. Keyed weakly so an entry dies with the grid
-	 * copy it describes -- a solve discards thousands of them.
-	 */
-	private final LoadingCache<Grid, ImmutableCollection<Cell>> cellCache = CacheBuilder.newBuilder()
-		.weakKeys()
-		.build(new CacheLoader<>() {
-
-			@Override
-			public ImmutableCollection<Cell> load(final Grid grid) {
-				return pointSet.stream()
-					.map(grid::getCellAt)
-					.collect(ImmutableList.toImmutableList());
-			}
-
-		});
-
 	public RectangleScope(final Rectangle rectangle) {
 		super();
 
@@ -43,8 +21,8 @@ class RectangleScope implements Scope {
 	}
 
 	@Override
-	public ImmutableCollection<Cell> getCells(final Grid grid) {
-		return cellCache.getUnchecked(grid);
+	public ImmutableSet<Point> getPoints() {
+		return pointSet;
 	}
 
 	@Override

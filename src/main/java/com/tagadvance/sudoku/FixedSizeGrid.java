@@ -4,7 +4,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.StandardSystemProperty;
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMap;
 import com.tagadvance.geometry.Dimension;
 import com.tagadvance.geometry.Point;
@@ -59,11 +58,6 @@ public class FixedSizeGrid implements Grid {
 	@Override
 	public Dimension getSize() {
 		return this.size;
-	}
-
-	@Override
-	public ImmutableCollection<Cell> getCells() {
-		return cellMap.values();
 	}
 
 	@Override
