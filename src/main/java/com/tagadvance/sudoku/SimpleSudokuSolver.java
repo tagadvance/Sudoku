@@ -67,7 +67,7 @@ public class SimpleSudokuSolver implements SudokuSolver {
 				}
 			}
 
-			cell.setValue('0');
+			cell.setValue(Cell.EMPTY);
 
 			return null;
 		}

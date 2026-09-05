@@ -9,6 +9,15 @@ import org.junit.jupiter.api.Test;
 class FixedSizeGridTest {
 
 	@Test
+	@DisplayName("a newly created grid holds nothing but empty cells")
+	void freshGridIsEmpty() {
+		final int width = 9, height = 9;
+		final var grid = new FixedSizeGrid(new Dimension(width, height));
+
+		assertEquals(width * height, grid.getEmptyCells().size());
+	}
+
+	@Test
 	@DisplayName("rejects a width below the minimum and names the bound")
 	void widthTooSmall() {
 		final var size = new Dimension(FixedSizeGrid.MIN_SIZE - 1, 9);

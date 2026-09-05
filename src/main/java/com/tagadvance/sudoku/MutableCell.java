@@ -2,7 +2,7 @@ package com.tagadvance.sudoku;
 
 class MutableCell implements Cell {
 
-	private char value;
+	private char value = EMPTY;
 
 	MutableCell() {
 		super();
@@ -14,7 +14,7 @@ class MutableCell implements Cell {
 
 	@Override
 	public boolean isEmpty() {
-		return this.value == '0';
+		return this.value == EMPTY;
 	}
 
 	@Override
