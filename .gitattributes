@@ -1,0 +1,6 @@
+* text=auto eol=lf
+
+# Gradle regenerates this file with CRLF on every wrapper upgrade.
+gradlew.bat text eol=crlf
+
+*.jar binary
