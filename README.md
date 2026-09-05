@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/tagadvance/Sudoku/actions/workflows/ci.yml/badge.svg)](https://github.com/tagadvance/Sudoku/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/tagadvance/Sudoku)](LICENSE)
-[![Java](https://img.shields.io/badge/Java-17%2B-007396?logo=openjdk&logoColor=white)](https://adoptium.net)
+[![Java](https://img.shields.io/badge/Java-25%2B-007396?logo=openjdk&logoColor=white)](https://adoptium.net)
 
 Sudoku solving algorithm written in Java.
 

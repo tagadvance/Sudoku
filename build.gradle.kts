@@ -29,12 +29,9 @@ dependencies {
     errorprone("com.google.errorprone:error_prone_core:2.42.0")
 }
 
-// CI builds against each supported LTS; the default is the project floor.
-val javaVersion = (findProperty("javaVersion") as String? ?: "17").toInt()
-
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(javaVersion))
+        languageVersion.set(JavaLanguageVersion.of(25))
     }
 }
 
