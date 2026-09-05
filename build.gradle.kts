@@ -15,8 +15,6 @@ dependencies {
     testImplementation("org.mockito:mockito-core:3.+")
     testImplementation("com.google.guava:guava-testlib:33.4.8-jre")
 
-    api("org.slf4j:slf4j-api:2.0.17")
-
     implementation("org.apache.commons:commons-math3:3.6.1")
     implementation("com.google.guava:guava:33.4.8-jre")
 }
