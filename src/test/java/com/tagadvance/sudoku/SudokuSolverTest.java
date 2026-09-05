@@ -8,6 +8,7 @@ import com.google.common.io.CharStreams;
 import com.tagadvance.geometry.Dimension;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Set;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
@@ -24,7 +25,7 @@ class SudokuSolverTest {
 		final int width = 9, height = 9;
 		final var size = new Dimension(width, height);
 		final var grid = new FixedSizeGrid(size);
-		var puzzles = readPuzzles(grid).toList();
+		var puzzles = readPuzzles(grid, values).toList();
 
 		final var scopeFactory = new SquareRootScopeFactory();
 		final var scopes = scopeFactory.createScopes(grid);
@@ -33,7 +34,8 @@ class SudokuSolverTest {
 		return puzzles.stream().map(puzzle -> new Object[]{sudoku, puzzle});
 	}
 
-	private static Stream<Grid> readPuzzles(final Grid grid) throws IOException {
+	private static Stream<Grid> readPuzzles(final Grid grid,
+		final Set<Character> values) throws IOException {
 		try (final var is = SudokuSolverTest.class.getResourceAsStream("/puzzles.txt")) {
 			if (is == null) {
 				return Stream.empty();
@@ -46,7 +48,7 @@ class SudokuSolverTest {
 					.filter(not(line -> line.isEmpty() || line.startsWith("#")))
 					.map(line -> {
 						final var puzzleGrid = grid.copy();
-						puzzleGrid.populate(line);
+						puzzleGrid.populate(line, values);
 
 						return puzzleGrid;
 					});
