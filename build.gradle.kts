@@ -30,6 +30,10 @@ java {
     }
 }
 
+tasks.withType<JavaCompile>().configureEach {
+    options.compilerArgs.add("-Xlint:all")
+}
+
 tasks.named<Test>("test") {
     useJUnitPlatform()
 }
