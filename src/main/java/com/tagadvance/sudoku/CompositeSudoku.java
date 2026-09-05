@@ -11,6 +11,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
+/**
+ * A sudoku defined by its value alphabet and a set of scopes. Nothing here assumes 9x9 or digits;
+ * the scopes carry the whole shape of the puzzle.
+ */
 public class CompositeSudoku implements Sudoku {
 
 	private final ImmutableSet<Character> values;
@@ -24,14 +28,13 @@ public class CompositeSudoku implements Sudoku {
 		.makeMap();
 
 	/**
-	 * @param values
-	 * @param scopeSet
+	 * @param values the alphabet, one symbol per row, column and block
+	 * @param scopeSet the row, column and block constraints, usually from a {@link ScopeFactory}
 	 */
-	protected CompositeSudoku(final ImmutableSet<Character> values,
-		final ImmutableSet<Scope> scopeSet) {
+	public CompositeSudoku(final Set<Character> values, final Set<Scope> scopeSet) {
 		super();
-		this.values = checkNotNull(values, "values must not be null");
-		this.scopeSet = checkNotNull(scopeSet, "scopeSet must not be null");
+		this.values = ImmutableSet.copyOf(checkNotNull(values, "values must not be null"));
+		this.scopeSet = ImmutableSet.copyOf(checkNotNull(scopeSet, "scopeSet must not be null"));
 	}
 
 	@Override
