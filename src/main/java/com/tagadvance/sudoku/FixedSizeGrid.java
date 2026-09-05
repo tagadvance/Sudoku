@@ -11,13 +11,13 @@ import com.tagadvance.geometry.Point;
 import java.util.Map.Entry;
 import java.util.function.Function;
 
-public class FixedSizeGrid<V> implements Grid<V> {
+public class FixedSizeGrid implements Grid {
 
 	public static final byte MIN_SIZE = 1, MAX_SIZE = 25;
 
 	private final Dimension size;
 
-	private final ImmutableMap<Point, Cell<V>> cellMap;
+	private final ImmutableMap<Point, Cell> cellMap;
 
 	public FixedSizeGrid(final Dimension size) {
 		super();
@@ -29,26 +29,26 @@ public class FixedSizeGrid<V> implements Grid<V> {
 		checkArgument(size.height() <= MAX_SIZE, "height must be <= %d", MAX_SIZE);
 
 		this.cellMap = size.stream()
-			.collect(ImmutableMap.toImmutableMap(Function.identity(), p -> new MutableCell<>()));
+			.collect(ImmutableMap.toImmutableMap(Function.identity(), p -> new MutableCell()));
 	}
 
-	private FixedSizeGrid(final Dimension size, final ImmutableMap<Point, Cell<V>> cellMap) {
+	private FixedSizeGrid(final Dimension size, final ImmutableMap<Point, Cell> cellMap) {
 		super();
 		this.size = size;
 		this.cellMap = cellMap;
 	}
 
 	@Override
-	public FixedSizeGrid<V> copy() {
-		final ImmutableMap<Point, Cell<V>> copy = cellMap.entrySet()
+	public FixedSizeGrid copy() {
+		final ImmutableMap<Point, Cell> copy = cellMap.entrySet()
 			.stream()
 			.collect(ImmutableMap.toImmutableMap(Entry::getKey, e -> {
 				final var value = e.getValue().getValue();
 
-				return new MutableCell<>(value);
+				return new MutableCell(value);
 			}));
 
-		return new FixedSizeGrid<>(size, copy);
+		return new FixedSizeGrid(size, copy);
 	}
 
 	@Override
@@ -57,12 +57,12 @@ public class FixedSizeGrid<V> implements Grid<V> {
 	}
 
 	@Override
-	public ImmutableCollection<Cell<V>> getCells() {
+	public ImmutableCollection<Cell> getCells() {
 		return cellMap.values();
 	}
 
 	@Override
-	public Cell<V> getCellAt(final Point point) {
+	public Cell getCellAt(final Point point) {
 		return cellMap.get(point);
 	}
 
@@ -73,8 +73,8 @@ public class FixedSizeGrid<V> implements Grid<V> {
 		for (int y = 0; y < size.height(); y++) {
 			for (int x = 0; x < size.width(); x++) {
 				Point point = new Point(x, y);
-				Cell<V> cell = getCellAt(point);
-				String value = cell.isEmpty() ? "?" : cell.getValue().toString();
+				Cell cell = getCellAt(point);
+				char value = cell.getValue();
 				if (x > 0) {
 					sb.append(" ");
 				}
@@ -87,5 +87,39 @@ public class FixedSizeGrid<V> implements Grid<V> {
 
 		return sb.toString();
 	}
+
+//	class PointerCell implements Cell {
+//
+//		private final Point point;
+//		private final int index;
+//		private V value;
+//
+//		PointerCell(final Point p, final int index) {
+//			this(p, index, null);
+//		}
+//
+//		PointerCell(final Point p, final int index, final V value) {
+//			this.point = p;
+//			this.index = index;
+//			this.value = value;
+//		}
+//
+//		@Override
+//		public boolean isEmpty() {
+//			return this.value == null;
+//		}
+//
+//		@Override
+//		public V getValue() {
+//			return this.value;
+//		}
+//
+//		@Override
+//		public void setValue(V value) {
+//			this.value = value;
+//		}
+//
+//	}
+
 
 }

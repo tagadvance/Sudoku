@@ -19,24 +19,25 @@ public class SudokuBuilder {
 		return new SudokuBuilder();
 	}
 
-	public SudokuFactory<Integer> createClassicSudokuFactory() {
+	public SudokuFactory createClassicSudokuFactory() {
 		return new ClassicSudokuFactory(scopeFactory);
 	}
 
-	public interface SudokuFactory<V> {
+	public interface SudokuFactory {
 
-		Grid<V> createEmptyGrid();
+		Grid createEmptyGrid();
 
-		Sudoku<V> createSudoku();
+		Sudoku createSudoku();
 
 	}
 
-	private static class ClassicSudokuFactory implements SudokuFactory<Integer> {
+	private static class ClassicSudokuFactory implements SudokuFactory {
 
-		private static final int SIZE = 9, RANGE_START = 1, RANGE_END = 9;
+		private static final int SIZE = 9;
+		private static final char RANGE_START = '1', RANGE_END = '9';
 
-		private static final ImmutableSet<Integer> values = IntStream.rangeClosed(RANGE_START,
-			RANGE_END).boxed().collect(ImmutableSet.toImmutableSet());
+		private static final ImmutableSet<Character> values = IntStream.rangeClosed(RANGE_START,
+			RANGE_END).mapToObj(i -> (Character) (char) i).collect(ImmutableSet.toImmutableSet());
 
 		private final ScopeFactory scopeFactory;
 
@@ -46,18 +47,18 @@ public class SudokuBuilder {
 		}
 
 		@Override
-		public Grid<Integer> createEmptyGrid() {
+		public Grid createEmptyGrid() {
 			final var size = new Dimension(SIZE, SIZE);
 
-			return new FixedSizeGrid<>(size);
+			return new FixedSizeGrid(size);
 		}
 
 		@Override
-		public Sudoku<Integer> createSudoku() {
+		public Sudoku createSudoku() {
 			final var grid = createEmptyGrid();
 			final var scopes = scopeFactory.createScopes(grid);
 
-			return new CompositeSudoku<>(values, scopes);
+			return new CompositeSudoku(values, scopes);
 		}
 
 	}

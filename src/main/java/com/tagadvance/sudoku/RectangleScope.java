@@ -12,7 +12,7 @@ import com.tagadvance.geometry.Point;
 import com.tagadvance.geometry.Rectangle;
 import java.util.Objects;
 
-class RectangleScope<V> implements Scope<V> {
+class RectangleScope implements Scope {
 
 	private final Rectangle rectangle;
 	private final ImmutableSet<Point> pointSet;
@@ -20,11 +20,11 @@ class RectangleScope<V> implements Scope<V> {
 	/**
 	 * cache of scopes for cell
 	 */
-	private final LoadingCache<Grid<V>, ImmutableCollection<Cell<V>>> cellCache = CacheBuilder.newBuilder()
+	private final LoadingCache<Grid, ImmutableCollection<Cell>> cellCache = CacheBuilder.newBuilder()
 		.build(new CacheLoader<>() {
 
 			@Override
-			public ImmutableCollection<Cell<V>> load(final Grid<V> grid) {
+			public ImmutableCollection<Cell> load(final Grid grid) {
 				return pointSet.stream()
 					.map(grid::getCellAt)
 					.collect(ImmutableList.toImmutableList());
@@ -41,7 +41,7 @@ class RectangleScope<V> implements Scope<V> {
 	}
 
 	@Override
-	public ImmutableCollection<Cell<V>> getCells(final Grid<V> grid) {
+	public ImmutableCollection<Cell> getCells(final Grid grid) {
 		return cellCache.getUnchecked(grid);
 	}
 
@@ -52,7 +52,7 @@ class RectangleScope<V> implements Scope<V> {
 
 	@Override
 	public boolean equals(final Object o) {
-		return o instanceof final RectangleScope<?> that && Objects.equals(rectangle,
+		return o instanceof final RectangleScope that && Objects.equals(rectangle,
 			that.rectangle) && Objects.equals(pointSet, that.pointSet);
 	}
 

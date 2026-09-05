@@ -1,11 +1,12 @@
 package com.tagadvance.sudoku;
 
-public interface Cell<V> {
+// TODO: replace with array reference
+public interface Cell {
 
 	boolean isEmpty();
 
-	V getValue();
+	char getValue();
 
-	void setValue(V value);
+	void setValue(char value);
 
 }

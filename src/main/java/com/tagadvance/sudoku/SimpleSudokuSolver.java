@@ -15,25 +15,25 @@ public class SimpleSudokuSolver implements SudokuSolver {
 	}
 
 	@Override
-	public <V> Grid<V> solve(final Sudoku<V> sudoku, final Grid<V> grid) {
+	public  Grid solve(final Sudoku sudoku, final Grid grid) {
 		checkNotNull(sudoku, "sudoku must not be null");
 		checkNotNull(grid, "grid must not be null");
 
-		return new InternalSudokuSolver<>(sudoku, grid.copy()).solve();
+		return new InternalSudokuSolver(sudoku, grid.copy()).solve();
 	}
 
-	private static class InternalSudokuSolver<V> {
+	private static class InternalSudokuSolver {
 
-		private final Sudoku<V> sudoku;
-		private final Grid<V> alphaGrid;
+		private final Sudoku sudoku;
+		private final Grid alphaGrid;
 
-		public InternalSudokuSolver(final Sudoku<V> sudoku, final Grid<V> grid) {
+		public InternalSudokuSolver(final Sudoku sudoku, final Grid grid) {
 			super();
 			this.sudoku = sudoku;
 			this.alphaGrid = grid;
 		}
 
-		public Grid<V> solve() {
+		public Grid solve() {
 			if (!sudoku.isValid(alphaGrid)) {
 				// FIXME: throw exception
 				return null;
@@ -47,13 +47,13 @@ public class SimpleSudokuSolver implements SudokuSolver {
 			return grid;
 		}
 
-		private Grid<V> solve(final Grid<V> grid) {
+		private Grid solve(final Grid grid) {
 			final var cells = grid.getEmptyCells();
 			prioritize(grid, cells);
 
 			final var cell = cells.remove(0);
 			final var potentialCellValues = sudoku.getPotentialValuesForCell(grid, cell);
-			for (final V value : potentialCellValues) {
+			for (final char value : potentialCellValues) {
 				cell.setValue(value);
 				if (sudoku.isSolved(grid)) {
 					return grid;
@@ -67,13 +67,13 @@ public class SimpleSudokuSolver implements SudokuSolver {
 				}
 			}
 
-			cell.setValue(null);
+			cell.setValue('0');
 
 			return null;
 		}
 
-		private void prioritize(final Grid<V> grid, final List<Cell<V>> emptyCells) {
-			final Map<Cell<V>, Integer> cells = emptyCells.stream()
+		private void prioritize(final Grid grid, final List<Cell> emptyCells) {
+			final Map<Cell, Integer> cells = emptyCells.stream()
 				.collect(Collectors.toMap(Function.identity(),
 					cell -> sudoku.getPotentialValuesForCell(grid, cell).size()));
 

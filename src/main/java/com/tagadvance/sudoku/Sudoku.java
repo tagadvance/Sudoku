@@ -3,19 +3,19 @@ package com.tagadvance.sudoku;
 import com.google.common.collect.ImmutableSet;
 import java.util.Set;
 
-public interface Sudoku<V> extends Copyable<Sudoku<V>> {
+public interface Sudoku extends Copyable<Sudoku> {
 
-	ImmutableSet<V> getValues();
+	ImmutableSet<Character> getValues();
 
-	ImmutableSet<Scope<V>> getScopes();
+	ImmutableSet<Scope> getScopes();
 
-	Set<V> getPotentialValuesForCell(Grid<V> grid, Cell<V> cell);
+	Set<Character> getPotentialValuesForCell(Grid grid, Cell cell);
 
-	default boolean isValid(final Grid<V> grid) {
+	default boolean isValid(final Grid grid) {
 		return getScopes().stream().allMatch(scope -> scope.isValid(grid));
 	}
 
-	default boolean isSolved(Grid<V> grid) {
+	default boolean isSolved(Grid grid) {
 		return getScopes().stream().allMatch(scope -> scope.isSolved(grid));
 	}
 

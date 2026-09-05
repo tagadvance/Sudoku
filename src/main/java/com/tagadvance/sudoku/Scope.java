@@ -7,25 +7,26 @@ import java.util.HashSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public interface Scope<V> {
+// TODO: replace with array reference
+public interface Scope {
 
-	default Stream<V> values(Grid<V> grid) {
+	default Stream<Character> values(Grid grid) {
 		return getCells(grid).stream().filter(not(Cell::isEmpty)).map(Cell::getValue);
 	}
 
-	Collection<Cell<V>> getCells(Grid<V> grid);
+	Collection<Cell> getCells(Grid grid);
 
-	default Collection<V> getUsedValues(final Grid<V> grid) {
+	default Collection<Character> getUsedValues(final Grid grid) {
 		return values(grid).collect(Collectors.toSet());
 	}
 
-	default boolean isValid(final Grid<V> grid) {
+	default boolean isValid(final Grid grid) {
 		final var set = new HashSet<>();
 
 		return values(grid).allMatch(set::add);
 	}
 
-	default boolean isSolved(final Grid<V> grid) {
+	default boolean isSolved(final Grid grid) {
 		final var cells = getCells(grid);
 
 		return values(grid).distinct().count() == cells.size();

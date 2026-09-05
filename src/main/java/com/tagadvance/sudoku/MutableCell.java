@@ -1,29 +1,29 @@
 package com.tagadvance.sudoku;
 
-class MutableCell<V> implements Cell<V> {
+class MutableCell implements Cell {
 
-	private V value;
+	private char value;
 
 	MutableCell() {
 		super();
 	}
 
-	MutableCell(final V value) {
+	MutableCell(final char value) {
 		this.value = value;
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return this.value == null;
+		return this.value == '0';
 	}
 
 	@Override
-	public V getValue() {
+	public char getValue() {
 		return this.value;
 	}
 
 	@Override
-	public void setValue(V value) {
+	public void setValue(final char value) {
 		this.value = value;
 	}
 

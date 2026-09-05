@@ -19,38 +19,38 @@ public class ForkJoinSudokuSolver implements SudokuSolver {
 	}
 
 	@Override
-	public <V> Grid<V> solve(final Sudoku<V> sudoku, final Grid<V> grid) {
+	public  Grid solve(final Sudoku sudoku, final Grid grid) {
 		requireNonNull(sudoku, "sudoku must not be null");
 		requireNonNull(grid, "grid must not be null");
 
-		final var solver = new SudokuSolverRecursiveTask<>(sudoku, grid);
+		final var solver = new SudokuSolverRecursiveTask(sudoku, grid);
 
 		return ForkJoinPool.commonPool().invoke(solver);
 	}
 
-	private static class SudokuSolverRecursiveTask<V> extends RecursiveTask<Grid<V>> {
+	private static class SudokuSolverRecursiveTask extends RecursiveTask<Grid> {
 
-		private final Sudoku<V> sudoku;
-		private final Grid<V> grid;
+		private final Sudoku sudoku;
+		private final Grid grid;
 
-		public SudokuSolverRecursiveTask(final Sudoku<V> sudoku, final Grid<V> grid) {
+		public SudokuSolverRecursiveTask(final Sudoku sudoku, final Grid grid) {
 			super();
 			this.sudoku = sudoku;
 			this.grid = grid;
 		}
 
 		@Override
-		protected Grid<V> compute() {
+		protected Grid compute() {
 			return solve(grid);
 		}
 
-		private Grid<V> solve(final Grid<V> grid) {
+		private Grid solve(final Grid grid) {
 			final var cells = grid.getEmptyCells();
 			prioritize(grid, cells);
 
 			final var cell = cells.remove(0);
 
-			final var forks = new ArrayList<ForkJoinTask<Grid<V>>>();
+			final var forks = new ArrayList<ForkJoinTask<Grid>>();
 			for (final var value : sudoku.getPotentialValuesForCell(grid, cell)) {
 				cell.setValue(value);
 				if (sudoku.isSolved(grid)) {
@@ -59,7 +59,7 @@ public class ForkJoinSudokuSolver implements SudokuSolver {
 					return null;
 				}
 
-				final var fork = new SudokuSolverRecursiveTask<>(sudoku, grid.copy()).fork();
+				final var fork = new SudokuSolverRecursiveTask(sudoku, grid.copy()).fork();
 				forks.add(fork);
 			}
 
@@ -70,7 +70,7 @@ public class ForkJoinSudokuSolver implements SudokuSolver {
 				.orElse(null);
 		}
 
-		private void prioritize(final Grid<V> grid, final List<Cell<V>> cells) {
+		private void prioritize(final Grid grid, final List<Cell> cells) {
 			final var potentialValueCountByCell = cells.stream()
 				.collect(Collectors.toMap(Function.identity(),
 					c -> sudoku.getPotentialValuesForCell(grid, c).size()));

@@ -13,19 +13,19 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class CompositeSudoku<V> implements Sudoku<V> {
+public class CompositeSudoku implements Sudoku {
 
-	private final ImmutableSet<V> values;
-	private final ImmutableSet<Scope<V>> scopeSet;
+	private final ImmutableSet<Character> values;
+	private final ImmutableSet<Scope> scopeSet;
 
 	/**
 	 * cache of scopes for cell
 	 */
-	private final LoadingCache<GridCellPair<V>, ImmutableCollection<Scope<V>>> scopeCache = CacheBuilder.newBuilder()
+	private final LoadingCache<GridCellPair, ImmutableCollection<Scope>> scopeCache = CacheBuilder.newBuilder()
 		.build(new CacheLoader<>() {
 
 			@Override
-			public ImmutableCollection<Scope<V>> load(final GridCellPair<V> pair) {
+			public ImmutableCollection<Scope> load(final GridCellPair pair) {
 				return getScopes().stream()
 					.filter(scope -> scope.getCells(pair.grid).contains(pair.cell))
 					.collect(ImmutableList.toImmutableList());
@@ -37,31 +37,32 @@ public class CompositeSudoku<V> implements Sudoku<V> {
 	 * @param values
 	 * @param scopeSet
 	 */
-	protected CompositeSudoku(final ImmutableSet<V> values, final ImmutableSet<Scope<V>> scopeSet) {
+	protected CompositeSudoku(final ImmutableSet<Character> values,
+		final ImmutableSet<Scope> scopeSet) {
 		super();
 		this.values = checkNotNull(values, "values must not be null");
 		this.scopeSet = checkNotNull(scopeSet, "scopeSet must not be null");
 	}
 
 	@Override
-	public Sudoku<V> copy() {
+	public Sudoku copy() {
 		// don't bother as this class is immutable
 		return this;
 	}
 
 	@Override
-	public ImmutableSet<V> getValues() {
+	public ImmutableSet<Character> getValues() {
 		return values;
 	}
 
 	@Override
-	public ImmutableSet<Scope<V>> getScopes() {
+	public ImmutableSet<Scope> getScopes() {
 		return scopeSet;
 	}
 
 	@Override
 	// TODO: Fix smelly code
-	public Set<V> getPotentialValuesForCell(final Grid<V> grid, final Cell<V> cell) {
+	public Set<Character> getPotentialValuesForCell(final Grid grid, final Cell cell) {
 		final var values = new HashSet<>(this.values);
 		getScopesForCell(grid, cell).stream()
 			.map(scope -> scope.getUsedValues(grid))
@@ -72,11 +73,11 @@ public class CompositeSudoku<V> implements Sudoku<V> {
 		return values;
 	}
 
-	private ImmutableCollection<Scope<V>> getScopesForCell(final Grid<V> grid, final Cell<V> cell) {
-		return scopeCache.getUnchecked(new GridCellPair<>(grid, cell));
+	private ImmutableCollection<Scope> getScopesForCell(final Grid grid, final Cell cell) {
+		return scopeCache.getUnchecked(new GridCellPair(grid, cell));
 	}
 
-	private record GridCellPair<V>(Grid<V> grid, Cell<V> cell) {
+	private record GridCellPair(Grid grid, Cell cell) {
 
 		@Override
 		public int hashCode() {
@@ -85,7 +86,7 @@ public class CompositeSudoku<V> implements Sudoku<V> {
 
 		@Override
 		public boolean equals(final Object o) {
-			return o instanceof GridCellPair<?> that && Objects.equals(grid, that.grid)
+			return o instanceof GridCellPair that && Objects.equals(grid, that.grid)
 				&& Objects.equals(cell, that.cell);
 		}
 
