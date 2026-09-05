@@ -90,38 +90,4 @@ public class FixedSizeGrid implements Grid {
 		return sb.toString();
 	}
 
-//	class PointerCell implements Cell {
-//
-//		private final Point point;
-//		private final int index;
-//		private V value;
-//
-//		PointerCell(final Point p, final int index) {
-//			this(p, index, null);
-//		}
-//
-//		PointerCell(final Point p, final int index, final V value) {
-//			this.point = p;
-//			this.index = index;
-//			this.value = value;
-//		}
-//
-//		@Override
-//		public boolean isEmpty() {
-//			return this.value == null;
-//		}
-//
-//		@Override
-//		public V getValue() {
-//			return this.value;
-//		}
-//
-//		@Override
-//		public void setValue(V value) {
-//			this.value = value;
-//		}
-//
-//	}
-
-
 }
