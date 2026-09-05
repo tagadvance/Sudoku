@@ -55,6 +55,7 @@ public class SudokuBuilder {
 			.collect(ImmutableSet.toImmutableSet()));
 	}
 
+	@SuppressWarnings("unused")
 	public SudokuBuilder scopeFactory(final ScopeFactory scopeFactory) {
 		this.scopeFactory = checkNotNull(scopeFactory, "scopeFactory must not be null");
 

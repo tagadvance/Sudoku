@@ -1,10 +1,10 @@
 package com.tagadvance.geometry;
 
 import com.google.common.base.MoreObjects;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import org.jspecify.annotations.NonNull;
 
 public record Rectangle(int x, int y, int width, int height) {
 
@@ -12,6 +12,7 @@ public record Rectangle(int x, int y, int width, int height) {
 		this(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
 	}
 
+	@SuppressWarnings("unused")
 	public Point point() {
 		return new Point(x, y);
 	}
@@ -27,17 +28,7 @@ public record Rectangle(int x, int y, int width, int height) {
 	}
 
 	@Override
-	public boolean equals(final Object o) {
-		return o instanceof final Rectangle rectangle && x == rectangle.x && y == rectangle.y
-			&& width == rectangle.width && height == rectangle.height;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(x, y, width, height);
-	}
-
-	@Override
+	@NonNull
 	public String toString() {
 		return MoreObjects.toStringHelper(Rectangle.class)
 			.add("x", x)

@@ -34,7 +34,7 @@ public class SquareRootScopeFactory implements ScopeFactory {
 		}
 
 		// add columns
-		int x = 0, y = 0;
+		int x, y = 0;
 		final int regionWidth = 1;
 		for (x = 0; x < width; x++) {
 			final var rectangle = new Rectangle(x, y, regionWidth, height);
