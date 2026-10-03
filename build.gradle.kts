@@ -19,7 +19,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    testImplementation(platform("org.mockito:mockito-bom:5.23.0"))
+    testImplementation(platform("org.mockito:mockito-bom:5.24.0"))
     testImplementation("org.mockito:mockito-core")
 
     testImplementation("com.google.guava:guava-testlib")
