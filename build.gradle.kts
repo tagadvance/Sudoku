@@ -24,7 +24,7 @@ dependencies {
 
     testImplementation("com.google.guava:guava-testlib")
 
-    errorprone("com.google.errorprone:error_prone_core:2.51.0")
+    errorprone("com.google.errorprone:error_prone_core:2.52.0")
 }
 
 java {
