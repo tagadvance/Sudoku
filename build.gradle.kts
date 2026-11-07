@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    implementation(platform("com.google.guava:guava-bom:33.7.2-jre"))
+    implementation(platform("com.google.guava:guava-bom:33.8.0-jre"))
     implementation("com.google.guava:guava")
     implementation("org.apache.commons:commons-math3:3.6.1")
 
